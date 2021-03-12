@@ -9,7 +9,7 @@ import java.nio.charset.Charset
 
 class Lambda {
 
-  def process(inputStream: InputStream, outputStream: OutputStream, context: Context) = {
+  def process(inputStream: InputStream, outputStream: OutputStream) = {
     println("Running")
     val apiUser = createUser("api_user", lambdaConfig.db.passwords.api)
     sql"GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA public TO $apiUser;".execute.apply()
