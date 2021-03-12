@@ -1,8 +1,7 @@
 package uk.gov.nationalarchives.db.users
 
 import scalikejdbc._
-import Config._
-import software.amazon.awssdk.core.interceptor.Context
+import uk.gov.nationalarchives.db.users.Config._
 
 import java.io.{InputStream, OutputStream}
 import java.nio.charset.Charset

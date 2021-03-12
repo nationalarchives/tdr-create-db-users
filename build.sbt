@@ -12,10 +12,7 @@ lazy val root = (project in file("."))
       pureConfig,
       postgres,
       scalikeJdbc,
-      ssm,
-      scalaTest % Test,
-      wiremock % Test,
-      h2 % Test
+      scalaTest % Test
     )
   )
 
