@@ -1,0 +1,2 @@
+# Create database users
+Once the consignment api database is created, we need to create users for the API and the migration task to use. This means that we don't have to use the master username and password to access the database, we can control permissions using GRANT and we can use IAM authentication for the database. 
