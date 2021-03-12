@@ -24,4 +24,4 @@ assemblyMergeStrategy in assembly := {
   case _ => MergeStrategy.first
 }
 
-assemblyJarName in assembly := "createdbuser.jar"
+assemblyJarName in assembly := "create-db-users.jar"
