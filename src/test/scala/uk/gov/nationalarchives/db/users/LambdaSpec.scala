@@ -10,15 +10,15 @@ import java.io.ByteArrayOutputStream
 class LambdaSpec extends AnyFlatSpec with Matchers {
 
   def prepareDb(username: String) = {
-//    val user = sqls.createUnsafely(username)
-//    sql"CREATE TABLE IF NOT EXISTS Test();".execute().apply()
-//    val userCount = sql"SELECT count(*) as userCount FROM pg_roles WHERE rolname = $username".map(_.int("userCount")).list.apply.head
-//    if (userCount > 0) {
-//      sql"REVOKE CONNECT ON DATABASE consignmentapi FROM $user;".execute.apply()
-//      sql"REVOKE USAGE ON SCHEMA public FROM $user;".execute.apply()
-//      sql"REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM $user;".execute.apply()
-//      sql"DROP USER IF EXISTS $user;".execute().apply()
-//    }
+    val user = sqls.createUnsafely(username)
+    sql"CREATE TABLE IF NOT EXISTS Test();".execute().apply()
+    val userCount = sql"SELECT count(*) as userCount FROM pg_roles WHERE rolname = $username".map(_.int("userCount")).list.apply.head
+    if (userCount > 0) {
+      sql"REVOKE CONNECT ON DATABASE consignmentapi FROM $user;".execute.apply()
+      sql"REVOKE USAGE ON SCHEMA public FROM $user;".execute.apply()
+      sql"REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM $user;".execute.apply()
+      sql"DROP USER IF EXISTS $user;".execute().apply()
+    }
   }
 
   def checkPrivileges(username: String, expectedPrivileges: List[String]) = {
