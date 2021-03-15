@@ -11,7 +11,7 @@ class Lambda {
 
   def process(inputStream: InputStream, outputStream: OutputStream) = {
     println("Running")
-    val apiUser = createUser("api_user")
+    val apiUser = createUser("consignment_api_user")
     sql"GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA public TO $apiUser;".execute.apply()
     val migrationsUser = createUser("migrations_user")
     sql"GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $migrationsUser;".execute.apply()
