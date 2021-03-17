@@ -11,9 +11,13 @@ If you want to run this against a local database, there are a few extra steps.
 
 Create the database if it doesn't exist. It will need the correct username and password. You can use docker
 
-`docker run --name postgres -e POSTGRES_PASSWORD=password -e POSTGRES_USER=tdr -e POSTGRES_DB=consignmentapi -d -p 5432:5432 postgres`
+`docker run --name postgres-db-users -e POSTGRES_PASSWORD=password -e POSTGRES_USER=tdr -e POSTGRES_DB=consignmentapi -d -p 5432:5432 postgres`
+
+Connect to the local database
+
+`PGPASSWORD=password psql -h localhost -p 5432 -U tdr -d consignmentapi`
   
-Connect to the database and create the `rds_iam` role. This exists by default on RDS instances but not on the postgres docker image.
+Create the `rds_iam` role. This exists by default on RDS instances but not on the postgres docker image.
 
 `CREATE ROLE rds_iam;`
 

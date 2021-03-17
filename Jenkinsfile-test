@@ -1,9 +1,9 @@
-@Library("tdr-jenkinslib@use-sbt-with-postgres-task") _
+library("tdr-jenkinslib")
 
 lambdaTests(
-        // Hard-code stage, since it is arbitrary in the lambdaTests
-        // function, which publishes the code to the management account
-        stage: "intg",
-        libraryName: "create-db-users",
-        deployJobName: "TDR Create DB User Deploy"
+  // Hard-code stage, since it is arbitrary in the lambdaTests
+  // function, which publishes the code to the management account
+  stage: "intg",
+  libraryName: "create-db-users",
+  deployJobName: "TDR Create DB User Deploy"
 )

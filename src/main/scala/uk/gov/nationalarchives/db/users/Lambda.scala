@@ -1,4 +1,3 @@
-
 package uk.gov.nationalarchives.db.users
 
 import scalikejdbc._
@@ -10,10 +9,9 @@ import java.nio.charset.Charset
 class Lambda {
 
   def process(inputStream: InputStream, outputStream: OutputStream) = {
-    println("Running")
-    val apiUser = createUser("consignment_api_user")
+    val apiUser = createUser(lambdaConfig.consignmentApiUser)
     sql"GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA public TO $apiUser;".execute.apply()
-    val migrationsUser = createUser("migrations_user")
+    val migrationsUser = createUser(lambdaConfig.migrationsUser)
     sql"GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $migrationsUser;".execute.apply()
     outputStream.write("Users created successfully".getBytes(Charset.defaultCharset()))
   }

@@ -32,10 +32,10 @@ class LambdaSpec extends AnyFlatSpec with Matchers {
   }
 
   "The process method" should s"create the users with the correct parameters" in {
-    prepareDb("api_user")
-    prepareDb("migrations_user")
+    prepareDb(lambdaConfig.consignmentApiUser)
+    prepareDb(lambdaConfig.migrationsUser)
     new Lambda().process(null, new ByteArrayOutputStream())
-    checkPrivileges("api_user", List("INSERT", "SELECT", "UPDATE"))
-    checkPrivileges("migrations_user", List("DELETE", "INSERT", "REFERENCES", "SELECT", "TRIGGER", "TRUNCATE", "UPDATE"))
+    checkPrivileges(lambdaConfig.consignmentApiUser, List("INSERT", "SELECT", "UPDATE"))
+    checkPrivileges(lambdaConfig.migrationsUser, List("DELETE", "INSERT", "REFERENCES", "SELECT", "TRIGGER", "TRUNCATE", "UPDATE"))
   }
 }
