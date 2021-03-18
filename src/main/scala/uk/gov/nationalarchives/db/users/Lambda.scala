@@ -11,8 +11,11 @@ class Lambda {
   def process(inputStream: InputStream, outputStream: OutputStream) = {
     val apiUser = createUser(lambdaConfig.consignmentApiUser)
     sql"GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA public TO $apiUser;".execute.apply()
+    sql"GRANT USAGE on consignment_sequence_id to $apiUser;".execute.apply()
     val migrationsUser = createUser(lambdaConfig.migrationsUser)
     sql"GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $migrationsUser;".execute.apply()
+    sql"GRANT ALL PRIVILEGES ON consignment_sequence_id TO $migrationsUser;".execute.apply()
+
     outputStream.write("Users created successfully".getBytes(Charset.defaultCharset()))
   }
 

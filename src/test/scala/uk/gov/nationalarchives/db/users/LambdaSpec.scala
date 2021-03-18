@@ -14,6 +14,7 @@ class LambdaSpec extends AnyFlatSpec with Matchers {
     sql"DROP ROLE IF EXISTS rds_iam".execute().apply()
     sql"CREATE ROLE rds_iam".execute().apply()
     sql"CREATE TABLE IF NOT EXISTS Test();".execute().apply()
+    sql"CREATE SEQUENCE IF NOT EXISTS consignment_sequence_id;".execute().apply()
     val userCount = sql"SELECT count(*) as userCount FROM pg_roles WHERE rolname = $username".map(_.int("userCount")).list.apply.head
     if (userCount > 0) {
 
