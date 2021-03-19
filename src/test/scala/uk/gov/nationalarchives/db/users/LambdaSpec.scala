@@ -14,12 +14,14 @@ class LambdaSpec extends AnyFlatSpec with Matchers {
     sql"DROP ROLE IF EXISTS rds_iam".execute().apply()
     sql"CREATE ROLE rds_iam".execute().apply()
     sql"CREATE TABLE IF NOT EXISTS Test();".execute().apply()
+    sql"CREATE SEQUENCE IF NOT EXISTS consignment_sequence_id;".execute().apply()
     val userCount = sql"SELECT count(*) as userCount FROM pg_roles WHERE rolname = $username".map(_.int("userCount")).list.apply.head
     if (userCount > 0) {
-
+      sql"ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE SELECT, INSERT, UPDATE ON TABLES FROM $user;".execute().apply()
       sql"REVOKE CONNECT ON DATABASE consignmentapi FROM $user;".execute.apply()
       sql"REVOKE USAGE ON SCHEMA public FROM $user;".execute.apply()
       sql"REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM $user;".execute.apply()
+      sql"REVOKE ALL PRIVILEGES ON consignment_sequence_id FROM $user;".execute().apply()
       sql"DROP USER IF EXISTS $user;".execute().apply()
     }
   }
