@@ -9,10 +9,12 @@ lazy val root = (project in file("."))
   .settings(
     name := "tdr-create-db-users",
     libraryDependencies ++= Seq(
+      awsUtils,
       pureConfig,
       postgres,
       scalikeJdbc,
-      scalaTest % Test
+      scalaTest % Test,
+      wiremock % Test
     )
   )
 
