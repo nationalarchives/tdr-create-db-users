@@ -7,5 +7,4 @@ object Dependencies {
   lazy val scalikeJdbc = "org.scalikejdbc" %% "scalikejdbc" % "3.5.0"
   lazy val pureConfig = "com.github.pureconfig" %% "pureconfig" % "0.14.1"
   lazy val wiremock = "com.github.tomakehurst" % "wiremock" % "2.27.2"
-
 }
