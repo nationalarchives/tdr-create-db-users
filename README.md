@@ -25,3 +25,6 @@ Run the `Main` object. This object is not used by the lambda, it is only for run
 
 ## Running the tests
 The tests run against a local postgres instance. We can't use h2 for testing because the syntax for creating users is different to postgres so you will need to run the docker command above to create a local postgres instance to run the tests from.
+
+## Adding new environment variables to the tests
+The environment variables in the deployed lambda are encrypted using KMS and then base64 encoded. These are then decoded in the lambda. Because of this, any variables in `src/test/resources/application.conf` which come from environment variables in `src/main/resources/application.conf` need to be stored base64 encoded. There are comments next to each variable to say what the base64 string decodes to. If you want to add a new variable you can run `echo -n "value of variable" | base64 -w 0` and paste the output into the test application.conf
