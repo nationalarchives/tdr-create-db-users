@@ -8,11 +8,16 @@ ThisBuild / organizationName := "db.users"
 lazy val root = (project in file("."))
   .settings(
     name := "tdr-create-db-users",
+    resolvers ++= Seq[Resolver](
+      "TDR Releases" at "s3://tdr-releases-mgmt"
+    ),
     libraryDependencies ++= Seq(
+      awsUtils,
       pureConfig,
       postgres,
       scalikeJdbc,
-      scalaTest % Test
+      scalaTest % Test,
+      wiremock % Test
     )
   )
 

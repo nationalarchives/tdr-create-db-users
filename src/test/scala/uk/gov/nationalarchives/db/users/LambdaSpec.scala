@@ -3,11 +3,45 @@ package uk.gov.nationalarchives.db.users
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import Config._
+import com.github.tomakehurst.wiremock.WireMockServer
+import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
+import com.github.tomakehurst.wiremock.client.WireMock.{equalToJson, okJson, post, urlEqualTo}
+import com.github.tomakehurst.wiremock.common.FileSource
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration
+import com.github.tomakehurst.wiremock.extension.{Parameters, ResponseDefinitionTransformer}
+import com.github.tomakehurst.wiremock.http.{Request, ResponseDefinition}
 import scalikejdbc._
 
 import java.io.ByteArrayOutputStream
+import java.nio.ByteBuffer
+import java.nio.charset.Charset
+
+import io.circe.generic.auto._
+import io.circe.parser.decode
 
 class LambdaSpec extends AnyFlatSpec with Matchers {
+
+  val kmsWiremock = new WireMockServer(new WireMockConfiguration().port(9001).extensions(new ResponseDefinitionTransformer {
+    override def transform(request: Request, responseDefinition: ResponseDefinition, files: FileSource, parameters: Parameters): ResponseDefinition = {
+      case class KMSRequest(CiphertextBlob: String)
+      decode[KMSRequest](request.getBodyAsString) match {
+        case Left(err) => throw err
+        case Right(req) =>
+          val charset = Charset.defaultCharset()
+          val plainText = charset.newDecoder.decode(ByteBuffer.wrap(req.CiphertextBlob.getBytes(charset))).toString
+          ResponseDefinitionBuilder
+            .like(responseDefinition)
+            .withBody(s"""{"Plaintext": "$plainText"}""")
+            .build()
+      }
+    }
+    override def getName: String = ""
+  }))
+
+  def prepareKmsMock() = {
+    kmsWiremock.stubFor(post(urlEqualTo("/")))
+    kmsWiremock.start()
+  }
 
   def prepareDb(username: String) = {
     val user = sqls.createUnsafely(username)
@@ -34,10 +68,12 @@ class LambdaSpec extends AnyFlatSpec with Matchers {
   }
 
   "The process method" should s"create the users with the correct parameters" in {
+    prepareKmsMock()
     prepareDb(lambdaConfig.consignmentApiUser)
     prepareDb(lambdaConfig.migrationsUser)
     new Lambda().process(null, new ByteArrayOutputStream())
     checkPrivileges(lambdaConfig.consignmentApiUser, List("INSERT", "SELECT", "UPDATE"))
     checkPrivileges(lambdaConfig.migrationsUser, List("DELETE", "INSERT", "REFERENCES", "SELECT", "TRIGGER", "TRUNCATE", "UPDATE"))
+    kmsWiremock.stop()
   }
 }
