@@ -44,6 +44,7 @@ class LambdaSpec extends AnyFlatSpec with Matchers {
 
   def prepareKeycloakDb(username: String) = {
     val user = sqls.createUnsafely(username)
+    sql"CREATE DATABASE keycloak;".execute().apply()
     sql"CREATE TABLE IF NOT EXISTS Test();".execute().apply()
     val userCount = sql"SELECT count(*) as userCount FROM pg_roles WHERE rolname = $username".map(_.int("userCount")).list.apply.head
     if(userCount > 0) {
@@ -51,6 +52,7 @@ class LambdaSpec extends AnyFlatSpec with Matchers {
       sql"REVOKE USAGE ON SCHEMA public FROM $user;".execute.apply()
       sql"REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM $user;".execute.apply()
       sql"DROP USER IF EXISTS $user;".execute().apply()
+      sql"DROP DATABASE KEYCLOAK;".execute().apply()
     }
   }
 
