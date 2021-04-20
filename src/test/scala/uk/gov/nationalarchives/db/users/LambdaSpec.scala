@@ -12,7 +12,6 @@ import com.github.tomakehurst.wiremock.extension.{Parameters, ResponseDefinition
 import com.github.tomakehurst.wiremock.http.{Request, ResponseDefinition}
 import scalikejdbc._
 
-import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
@@ -43,7 +42,19 @@ class LambdaSpec extends AnyFlatSpec with Matchers {
     kmsWiremock.start()
   }
 
-  def prepareDb(username: String) = {
+  def prepareKeycloakDb(username: String) = {
+    val user = sqls.createUnsafely(username)
+    sql"CREATE TABLE IF NOT EXISTS Test();".execute().apply()
+    val userCount = sql"SELECT count(*) as userCount FROM pg_roles WHERE rolname = $username".map(_.int("userCount")).list.apply.head
+    if(userCount > 0) {
+      sql"REVOKE CONNECT ON DATABASE keycloak FROM $user;".execute.apply()
+      sql"REVOKE USAGE ON SCHEMA public FROM $user;".execute.apply()
+      sql"REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM $user;".execute.apply()
+      sql"DROP USER IF EXISTS $user;".execute().apply()
+    }
+  }
+
+  def prepareConsignmentDb(username: String) = {
     val user = sqls.createUnsafely(username)
     sql"DROP ROLE IF EXISTS rds_iam".execute().apply()
     sql"CREATE ROLE rds_iam".execute().apply()
@@ -67,13 +78,20 @@ class LambdaSpec extends AnyFlatSpec with Matchers {
     privileges.sorted should equal(expectedPrivileges)
   }
 
-  "The process method" should s"create the users with the correct parameters" in {
+  "The process method" should s"create the users with the correct parameters in the consignment database" in {
     prepareKmsMock()
-    prepareDb(lambdaConfig.consignmentApiUser)
-    prepareDb(lambdaConfig.migrationsUser)
-    new Lambda().process(null, new ByteArrayOutputStream())
+    prepareConsignmentDb(lambdaConfig.consignmentApiUser)
+    prepareConsignmentDb(lambdaConfig.migrationsUser)
+    new Lambda().createUsers("consignmentapi")
     checkPrivileges(lambdaConfig.consignmentApiUser, List("INSERT", "SELECT", "UPDATE"))
     checkPrivileges(lambdaConfig.migrationsUser, List("DELETE", "INSERT", "REFERENCES", "SELECT", "TRIGGER", "TRUNCATE", "UPDATE"))
     kmsWiremock.stop()
+  }
+
+  "The process method" should s"create the users with the correct parameters in the keycloak database" in {
+    prepareKmsMock()
+    prepareKeycloakDb(lambdaConfig.keycloakUser)
+    new Lambda().createUsers("keycloak")
+    checkPrivileges(lambdaConfig.keycloakUser, List("DELETE", "INSERT", "REFERENCES", "SELECT", "TRIGGER", "TRUNCATE", "UPDATE"))
   }
 }
