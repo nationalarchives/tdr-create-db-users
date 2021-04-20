@@ -1,8 +1,0 @@
-library("tdr-jenkinslib")
-
-deployToLambda(
-  stage: params.STAGE,
-  libraryName: "create-keycloak-db-user",
-  version: params.TO_DEPLOY,
-  deploymentPackageName: "create-db-users.jar"
-)
