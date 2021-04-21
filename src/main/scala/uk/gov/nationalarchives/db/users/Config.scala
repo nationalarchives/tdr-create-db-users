@@ -7,6 +7,7 @@ import uk.gov.nationalarchives.aws.utils.Clients.kms
 import uk.gov.nationalarchives.aws.utils.KMSUtils
 
 object Config {
+
   case class LambdaConfig(driver: String, username: String, password: String, url: String, consignmentApiUser: String, migrationsUser: String, functionName: String, kmsEndpoint: String, databaseName: String, keycloakUser: String, keycloakPassword: String)
 
   val lambdaConfig: LambdaConfig = ConfigSource.default.load[LambdaConfig] match {
@@ -14,11 +15,13 @@ object Config {
     case Right(value) =>
       val kmsUtils: KMSUtils = KMSUtils(kms(value.kmsEndpoint), Map("LambdaFunctionName" -> value.functionName))
       value.copy(
-      username = kmsUtils.decryptValue(value.username),
-      password = kmsUtils.decryptValue(value.password),
-      url = kmsUtils.decryptValue(value.url),
-      databaseName = kmsUtils.decryptValue(value.databaseName)
-    )
+        username = kmsUtils.decryptValue(value.username),
+        password = kmsUtils.decryptValue(value.password),
+        url = kmsUtils.decryptValue(value.url),
+        databaseName = kmsUtils.decryptValue(value.databaseName),
+        keycloakPassword = kmsUtils.decryptValue(value.keycloakPassword)
+
+      )
   }
 
   implicit val session: AutoSession.type = AutoSession
