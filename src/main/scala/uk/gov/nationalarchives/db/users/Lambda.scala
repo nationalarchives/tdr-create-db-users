@@ -8,21 +8,20 @@ import java.nio.charset.Charset
 
 class Lambda {
 
-  def process(inputStream: InputStream, outputStream: OutputStream) = {
+  def process(inputStream: InputStream, outputStream: OutputStream): Unit = {
     createUsers(lambdaConfig.databaseName)
 
     outputStream.write("Users created successfully".getBytes(Charset.defaultCharset()))
   }
 
-  def createUsers(databaseName: String) = {
+  def createUsers(databaseName: String): Boolean = {
     databaseName match {
       case "consignmentapi" => createConsignmentApiUsers
       case "keycloak" => createKeycloakUsers
     }
-
   }
 
-  def createKeycloakUsers = {
+  def createKeycloakUsers: Boolean = {
     val user = sqls.createUnsafely(lambdaConfig.keycloakUser)
     val password = sqls.createUnsafely(lambdaConfig.keycloakPassword)
     sql"CREATE USER $user WITH PASSWORD '$password'".execute().apply()
@@ -31,7 +30,7 @@ class Lambda {
     sql"GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $user;".execute.apply()
   }
 
-  def createConsignmentApiUsers = {
+  def createConsignmentApiUsers: Boolean = {
     val apiUser = createConsignmentApiUser(lambdaConfig.consignmentApiUser)
     sql"GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA public TO $apiUser;".execute.apply()
     sql"GRANT USAGE on consignment_sequence_id to $apiUser;".execute.apply()

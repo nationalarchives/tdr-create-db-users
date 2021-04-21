@@ -5,7 +5,7 @@ import org.scalatest.matchers.should.Matchers
 import Config._
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
-import com.github.tomakehurst.wiremock.client.WireMock.{equalToJson, okJson, post, urlEqualTo}
+import com.github.tomakehurst.wiremock.client.WireMock.{post, urlEqualTo}
 import com.github.tomakehurst.wiremock.common.FileSource
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.extension.{Parameters, ResponseDefinitionTransformer}
@@ -14,9 +14,9 @@ import scalikejdbc._
 
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
-
 import io.circe.generic.auto._
 import io.circe.parser.decode
+import org.scalatest.Assertion
 
 class LambdaSpec extends AnyFlatSpec with Matchers {
 
@@ -37,12 +37,12 @@ class LambdaSpec extends AnyFlatSpec with Matchers {
     override def getName: String = ""
   }))
 
-  def prepareKmsMock() = {
+  def prepareKmsMock(): Unit = {
     kmsWiremock.stubFor(post(urlEqualTo("/")))
     kmsWiremock.start()
   }
 
-  def prepareKeycloakDb(username: String) = {
+  def prepareKeycloakDb(username: String): AnyVal = {
     val user = sqls.createUnsafely(username)
     sql"CREATE DATABASE keycloak;".execute().apply()
     sql"CREATE TABLE IF NOT EXISTS Test();".execute().apply()
@@ -56,7 +56,7 @@ class LambdaSpec extends AnyFlatSpec with Matchers {
     }
   }
 
-  def prepareConsignmentDb(username: String) = {
+  def prepareConsignmentDb(username: String): AnyVal = {
     val user = sqls.createUnsafely(username)
     sql"DROP ROLE IF EXISTS rds_iam".execute().apply()
     sql"CREATE ROLE rds_iam".execute().apply()
@@ -73,7 +73,7 @@ class LambdaSpec extends AnyFlatSpec with Matchers {
     }
   }
 
-  def checkPrivileges(username: String, expectedPrivileges: List[String]) = {
+  def checkPrivileges(username: String, expectedPrivileges: List[String]): Assertion = {
     val privileges: List[String] = sql"SELECT privilege_type FROM information_schema.table_privileges WHERE grantee=$username"
       .map(rs => rs.string("privilege_type"))
       .list.apply()
