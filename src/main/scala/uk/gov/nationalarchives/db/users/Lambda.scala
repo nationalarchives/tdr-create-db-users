@@ -25,8 +25,7 @@ class Lambda {
     val user = sqls.createUnsafely(lambdaConfig.keycloakUser)
     val password = sqls.createUnsafely(lambdaConfig.keycloakPassword)
     sql"CREATE USER $user WITH PASSWORD '$password'".execute().apply()
-    sql"GRANT CONNECT ON DATABASE keycloak TO $user;".execute.apply()
-    sql"GRANT USAGE ON SCHEMA public TO $user;".execute.apply()
+    grantConnectAndUsage(user, sqls.createUnsafely("keycloak"))
     sql"GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $user;".execute.apply()
   }
 
@@ -44,13 +43,17 @@ class Lambda {
     sql"GRANT ALL PRIVILEGES ON consignment_sequence_id TO $migrationsUser;".execute.apply()
   }
 
+  def grantConnectAndUsage(user: SQLSyntax, database: SQLSyntax) = {
+    sql"GRANT CONNECT ON DATABASE $database TO $user;".execute.apply()
+    sql"GRANT USAGE ON SCHEMA public TO $user;".execute.apply()
+  }
+
   def createConsignmentApiUser(username: String): SQLSyntax = {
     //createUnsafely is needed as the usual interpolation returns ERROR: syntax error at or near "$1"
     //There is a similar issue here https://github.com/scalikejdbc/scalikejdbc/issues/320
     val user = sqls.createUnsafely(username)
     sql"CREATE USER $user".execute().apply()
-    sql"GRANT CONNECT ON DATABASE consignmentapi TO $user;".execute.apply()
-    sql"GRANT USAGE ON SCHEMA public TO $user;".execute.apply()
+    grantConnectAndUsage(user, sqls.createUnsafely("consignmentapi"))
     sql"GRANT rds_iam TO $user;".execute().apply()
     user
   }
