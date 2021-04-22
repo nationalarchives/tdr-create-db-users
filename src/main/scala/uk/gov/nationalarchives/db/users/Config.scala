@@ -7,16 +7,24 @@ import uk.gov.nationalarchives.aws.utils.Clients.kms
 import uk.gov.nationalarchives.aws.utils.KMSUtils
 
 object Config {
-  case class LambdaConfig(driver: String, username: String, password: String, url: String, consignmentApiUser: String, migrationsUser: String, functionName: String, kmsEndpoint: String)
+
+  case class LambdaConfig(driver: String, username: String, password: String, url: String, consignmentApiUser: String, migrationsUser: String, functionName: String, kmsEndpoint: String, databaseName: String, keycloakUser: String, keycloakPassword: String)
 
   val lambdaConfig: LambdaConfig = ConfigSource.default.load[LambdaConfig] match {
     case Left(error) => throw new RuntimeException(error.prettyPrint(0))
-    case Right(value) => value
-  }
+    case Right(value) =>
+      val kmsUtils: KMSUtils = KMSUtils(kms(value.kmsEndpoint), Map("LambdaFunctionName" -> value.functionName))
+      value.copy(
+        username = kmsUtils.decryptValue(value.username),
+        password = kmsUtils.decryptValue(value.password),
+        url = kmsUtils.decryptValue(value.url),
+        databaseName = kmsUtils.decryptValue(value.databaseName),
+        keycloakPassword = kmsUtils.decryptValue(value.keycloakPassword)
 
-  val kmsUtils: KMSUtils = KMSUtils(kms(lambdaConfig.kmsEndpoint), Map("LambdaFunctionName" -> lambdaConfig.functionName))
+      )
+  }
 
   implicit val session: AutoSession.type = AutoSession
   Class.forName(lambdaConfig.driver)
-  ConnectionPool.singleton(kmsUtils.decryptValue(lambdaConfig.url), kmsUtils.decryptValue(lambdaConfig.username), kmsUtils.decryptValue(lambdaConfig.password))
+  ConnectionPool.singleton(lambdaConfig.url, lambdaConfig.username, lambdaConfig.password)
 }
