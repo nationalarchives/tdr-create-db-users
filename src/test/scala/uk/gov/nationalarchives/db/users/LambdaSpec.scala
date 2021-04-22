@@ -80,7 +80,7 @@ class LambdaSpec extends AnyFlatSpec with Matchers {
     privileges.sorted should equal(expectedPrivileges)
   }
 
-  "The process method" should s"create the users with the correct parameters in the consignment database" in {
+  "The process method" should "create the users with the correct parameters in the consignment database" in {
     prepareKmsMock()
     prepareConsignmentDb(lambdaConfig.consignmentApiUser)
     prepareConsignmentDb(lambdaConfig.migrationsUser)
@@ -90,7 +90,7 @@ class LambdaSpec extends AnyFlatSpec with Matchers {
     kmsWiremock.stop()
   }
 
-  "The process method" should s"create the users with the correct parameters in the keycloak database" in {
+  "The process method" should "create the users with the correct parameters in the keycloak database" in {
     prepareKmsMock()
     prepareKeycloakDb(lambdaConfig.keycloakUser)
     new Lambda().createUsers("keycloak")
