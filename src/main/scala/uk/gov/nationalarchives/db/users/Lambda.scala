@@ -17,11 +17,11 @@ class Lambda {
   def createUsers(databaseName: String): Boolean = {
     databaseName match {
       case "consignmentapi" => createConsignmentApiUsers
-      case "keycloak" => createKeycloakUsers
+      case "keycloak" => createKeycloakUser
     }
   }
 
-  def createKeycloakUsers: Boolean = {
+  def createKeycloakUser: Boolean = {
     val user = sqls.createUnsafely(lambdaConfig.keycloakUser)
     val password = sqls.createUnsafely(lambdaConfig.keycloakPassword)
     sql"CREATE USER $user WITH PASSWORD '$password'".execute().apply()
