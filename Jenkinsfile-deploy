@@ -39,9 +39,12 @@ pipeline {
   post {
     success {
       script {
-        if(params.STAGE != "prod") {
-          tdr.runEndToEndTests(0, params.STAGE, BUILD_URL)
-        }
+        tdr.postToDaTdrSlackChannel(colour: "danger", message: "*Create DB users* :warning: Deployment of the create database users lambdas has failed.")
+      }
+    }
+    failure {
+      script {
+        tdr.postToDaTdrSlackChannel(colour: "good", message: "*Create DB users* :arrow_up: The create database users lambdas have been deployed")
       }
     }
   }
