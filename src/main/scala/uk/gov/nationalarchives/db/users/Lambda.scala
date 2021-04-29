@@ -61,7 +61,7 @@ class Lambda {
 
   def createConsignmentApiUser(username: String): SQLSyntax = {
     //createUnsafely is needed as the usual interpolation returns ERROR: syntax error at or near "$1"
-    //    There is a similar issue here https://github.com/scalikejdbc/scalikejdbc/issues/320
+    //There is a similar issue here https://github.com/scalikejdbc/scalikejdbc/issues/320
     val user = sqls.createUnsafely(username)
     val password = sqls.createUnsafely("password")
     sql"CREATE USER $user WITH PASSWORD '$password'".execute().apply()
