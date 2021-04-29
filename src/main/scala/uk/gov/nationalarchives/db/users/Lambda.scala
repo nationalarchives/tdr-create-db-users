@@ -23,7 +23,11 @@ class Lambda {
 
   def createKeycloakUser: Boolean = {
     val user = sqls.createUnsafely(lambdaConfig.keycloakUser)
-    val password = sqls.createUnsafely(lambdaConfig.keycloakPassword)
+    val keycloakPassword = lambdaConfig.keycloakPassword match {
+      case Some(value) => value
+      case None => throw new RuntimeException("Keycloak password has not been provided")
+    }
+    val password = sqls.createUnsafely(keycloakPassword)
     sql"CREATE USER $user WITH PASSWORD '$password'".execute().apply()
     grantConnectAndUsage(user, sqls.createUnsafely("keycloak"))
     sql"GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $user;".execute.apply()
