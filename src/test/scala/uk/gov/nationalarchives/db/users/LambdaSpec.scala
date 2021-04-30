@@ -18,6 +18,8 @@ import io.circe.generic.auto._
 import io.circe.parser.decode
 import org.scalatest.Assertion
 
+import scala.util.Try
+
 class LambdaSpec extends AnyFlatSpec with Matchers {
 
   val kmsWiremock = new WireMockServer(new WireMockConfiguration().port(9001).extensions(new ResponseDefinitionTransformer {
@@ -44,7 +46,8 @@ class LambdaSpec extends AnyFlatSpec with Matchers {
 
   def prepareKeycloakDb(username: String): AnyVal = {
     val user = sqls.createUnsafely(username)
-    sql"CREATE DATABASE keycloak;".execute().apply()
+    sql"SET ROLE tdr".execute().apply()
+    Try(sql"CREATE DATABASE keycloak;".execute().apply())
     sql"CREATE TABLE IF NOT EXISTS Test();".execute().apply()
     val userCount = sql"SELECT count(*) as userCount FROM pg_roles WHERE rolname = $username".map(_.int("userCount")).list.apply.head
     if(userCount > 0) {
@@ -52,32 +55,42 @@ class LambdaSpec extends AnyFlatSpec with Matchers {
       sql"REVOKE USAGE ON SCHEMA public FROM $user;".execute.apply()
       sql"REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM $user;".execute.apply()
       sql"DROP USER IF EXISTS $user;".execute().apply()
-      sql"DROP DATABASE KEYCLOAK;".execute().apply()
     }
   }
 
-  def prepareConsignmentDb(username: String): AnyVal = {
+    def prepareConsignmentDb(username: String): AnyVal = {
     val user = sqls.createUnsafely(username)
     sql"DROP ROLE IF EXISTS rds_iam".execute().apply()
     sql"CREATE ROLE rds_iam".execute().apply()
-    sql"CREATE TABLE IF NOT EXISTS Test();".execute().apply()
     sql"CREATE SEQUENCE IF NOT EXISTS consignment_sequence_id;".execute().apply()
     val userCount = sql"SELECT count(*) as userCount FROM pg_roles WHERE rolname = $username".map(_.int("userCount")).list.apply.head
     if (userCount > 0) {
-      sql"ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE SELECT, INSERT, UPDATE ON TABLES FROM $user;".execute().apply()
+      sql"SET ROLE tdr;".execute().apply()
       sql"REVOKE CONNECT ON DATABASE consignmentapi FROM $user;".execute.apply()
       sql"REVOKE USAGE ON SCHEMA public FROM $user;".execute.apply()
-      sql"REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM $user;".execute.apply()
+      sql"SET ROLE migrations_user".execute().apply()
+      sql"ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE SELECT, INSERT, UPDATE ON TABLES FROM $user;".execute().apply()
+      sql"SET ROLE tdr".execute().apply()
       sql"REVOKE ALL PRIVILEGES ON consignment_sequence_id FROM $user;".execute().apply()
+      sql"REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM $user;".execute.apply()
+      sql"DROP TABLE IF EXISTS test;".execute().apply()
+      sql"DROP SEQUENCE IF EXISTS consignment_sequence_id".execute().apply()
       sql"DROP USER IF EXISTS $user;".execute().apply()
     }
   }
 
   def checkPrivileges(username: String, expectedPrivileges: List[String]): Assertion = {
+    sql"SET ROLE migrations_user;".execute().apply()
     val privileges: List[String] = sql"SELECT privilege_type FROM information_schema.table_privileges WHERE grantee=$username"
       .map(rs => rs.string("privilege_type"))
       .list.apply()
     privileges.sorted should equal(expectedPrivileges)
+  }
+
+  def createTable(username: String) = {
+    val user = sqls.createUnsafely(username)
+    sql"SET ROLE $user;".execute().apply()
+    sql"CREATE TABLE IF NOT EXISTS Test();".execute().apply()
   }
 
   "The process method" should "create the users with the correct parameters in the consignment database" in {
@@ -85,6 +98,7 @@ class LambdaSpec extends AnyFlatSpec with Matchers {
     prepareConsignmentDb(lambdaConfig.consignmentApiUser)
     prepareConsignmentDb(lambdaConfig.migrationsUser)
     new Lambda().createUsers("consignmentapi")
+    createTable(lambdaConfig.migrationsUser)
     checkPrivileges(lambdaConfig.consignmentApiUser, List("INSERT", "SELECT", "UPDATE"))
     checkPrivileges(lambdaConfig.migrationsUser, List("DELETE", "INSERT", "REFERENCES", "SELECT", "TRIGGER", "TRUNCATE", "UPDATE"))
     kmsWiremock.stop()
@@ -94,6 +108,7 @@ class LambdaSpec extends AnyFlatSpec with Matchers {
     prepareKmsMock()
     prepareKeycloakDb(lambdaConfig.keycloakUser)
     new Lambda().createUsers("keycloak")
+    createTable(lambdaConfig.keycloakUser)
     checkPrivileges(lambdaConfig.keycloakUser, List("DELETE", "INSERT", "REFERENCES", "SELECT", "TRIGGER", "TRUNCATE", "UPDATE"))
   }
 }
