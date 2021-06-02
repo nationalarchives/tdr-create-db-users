@@ -8,7 +8,7 @@ import uk.gov.nationalarchives.aws.utils.KMSUtils
 
 object Config {
 
-  case class LambdaConfig(driver: String, username: String, password: String, url: String, consignmentApiUser: String, migrationsUser: String, functionName: String, kmsEndpoint: String, databaseName: String, keycloakUser: String, keycloakPassword: Option[String])
+  case class LambdaConfig(driver: String, username: String, password: String, url: String, consignmentApiUser: String, migrationsUser: String, functionName: String, kmsEndpoint: String, databaseName: String, keycloakUser: String, keycloakPassword: Option[String], bastionUser: String)
 
   val lambdaConfig: LambdaConfig = ConfigSource.default.load[LambdaConfig] match {
     case Left(error) => throw new RuntimeException(error.prettyPrint(0))
