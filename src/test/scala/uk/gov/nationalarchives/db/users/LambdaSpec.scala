@@ -70,6 +70,7 @@ class LambdaSpec extends AnyFlatSpec with Matchers {
       sql"REVOKE USAGE ON SCHEMA public FROM $user;".execute.apply()
       sql"SET ROLE migrations_user".execute().apply()
       sql"ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE SELECT, INSERT, UPDATE ON TABLES FROM $user;".execute().apply()
+      sql"ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL PRIVILEGES ON SEQUENCES FROM $user;".execute().apply()
       sql"SET ROLE tdr".execute().apply()
       sql"REVOKE ALL PRIVILEGES ON consignment_sequence_id FROM $user;".execute().apply()
       sql"REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM $user;".execute.apply()
@@ -110,5 +111,16 @@ class LambdaSpec extends AnyFlatSpec with Matchers {
     new Lambda().createUsers("keycloak")
     createTable(lambdaConfig.keycloakUser)
     checkPrivileges(lambdaConfig.keycloakUser, List("DELETE", "INSERT", "REFERENCES", "SELECT", "TRIGGER", "TRUNCATE", "UPDATE"))
+  }
+
+  "The process method" should "create the users with the correct parameters for the bastion user" in {
+    sql"SET ROLE tdr;".execute().apply()
+    prepareKmsMock()
+    prepareConsignmentDb(lambdaConfig.bastionUser)
+    createTable(lambdaConfig.migrationsUser)
+    sql"SET ROLE tdr;".execute().apply()
+    new Lambda().createUsers("bastion")
+    checkPrivileges(lambdaConfig.bastionUser, List("SELECT"))
+    kmsWiremock.stop()
   }
 }
