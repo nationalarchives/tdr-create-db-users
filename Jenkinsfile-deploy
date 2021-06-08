@@ -20,6 +20,7 @@ pipeline {
           def accountNumber = tdr.getAccountNumberFromStage(params.STAGE)
           sh "python3 /deploy_lambda_from_s3.py ${accountNumber} ${params.STAGE} tdr-create-keycloak-db-user-${params.STAGE} tdr-backend-code-mgmt ${params.TO_DEPLOY}/create-db-users.jar"
           sh "python3 /deploy_lambda_from_s3.py ${accountNumber} ${params.STAGE} tdr-create-db-users-${params.STAGE} tdr-backend-code-mgmt ${params.TO_DEPLOY}/create-db-users.jar"
+          sh "python3 /deploy_lambda_from_s3.py ${accountNumber} ${params.STAGE} tdr-create-bastion-user-${params.STAGE} tdr-backend-code-mgmt ${params.TO_DEPLOY}/create-db-users.jar"
         }
       }
     }
