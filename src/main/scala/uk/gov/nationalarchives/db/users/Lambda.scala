@@ -18,7 +18,17 @@ class Lambda {
     databaseName match {
       case "consignmentapi" => createConsignmentApiUsers
       case "keycloak" => createKeycloakUser
+      case "bastion" => createBastionUser
     }
+  }
+
+  def createBastionUser: Boolean = {
+    val user = createConsignmentApiUser(lambdaConfig.bastionUser)
+    //Grant access to tables created before we started using the migrations user
+    sql"GRANT SELECT ON ALL TABLES IN SCHEMA public TO $user;".execute().apply()
+    sql"SET ROLE migrations_user;".execute().apply()
+    //Grant access to tables created by the migrations user.
+    sql"GRANT SELECT ON ALL TABLES IN SCHEMA public TO $user;".execute().apply()
   }
 
   def createKeycloakUser: Boolean = {
@@ -64,8 +74,7 @@ class Lambda {
     //createUnsafely is needed as the usual interpolation returns ERROR: syntax error at or near "$1"
     //There is a similar issue here https://github.com/scalikejdbc/scalikejdbc/issues/320
     val user = sqls.createUnsafely(username)
-    val password = sqls.createUnsafely("password")
-    sql"CREATE USER $user WITH PASSWORD '$password'".execute().apply()
+    sql"CREATE USER $user".execute().apply()
     grantConnectAndUsage(user, sqls.createUnsafely("consignmentapi"))
     sql"GRANT rds_iam TO $user;".execute().apply()
     user
