@@ -41,6 +41,8 @@ class Lambda {
     sql"CREATE USER $user WITH PASSWORD '$password'".execute().apply()
     grantConnectAndUsage(user, sqls.createUnsafely("keycloak"))
     sql"GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $user;".execute.apply()
+    //Grant access to new tables. Keycloak upgrades sometimes create new tables
+    sql"ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES to $user".execute().apply()
   }
 
   def createConsignmentApiUsers: Boolean = {
