@@ -46,42 +46,42 @@ class LambdaSpec extends AnyFlatSpec with Matchers {
 
   def prepareKeycloakDb(username: String): AnyVal = {
     val user = sqls.createUnsafely(username)
-    sql"SET ROLE tdr".execute().apply()
-    Try(sql"CREATE DATABASE keycloak;".execute().apply())
-    sql"CREATE TABLE IF NOT EXISTS Test();".execute().apply()
+    sql"SET ROLE tdr".execute()
+    Try(sql"CREATE DATABASE keycloak;".execute())
+    sql"CREATE TABLE IF NOT EXISTS Test();".execute()
     val userCount = sql"SELECT count(*) as userCount FROM pg_roles WHERE rolname = $username".map(_.int("userCount")).list.apply.head
     if(userCount > 0) {
       sql"REVOKE CONNECT ON DATABASE keycloak FROM $user;".execute.apply()
       sql"REVOKE USAGE ON SCHEMA public FROM $user;".execute.apply()
       sql"REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM $user;".execute.apply()
-      sql"DROP USER IF EXISTS $user;".execute().apply()
+      sql"DROP USER IF EXISTS $user;".execute()
     }
   }
 
     def prepareConsignmentDb(username: String): AnyVal = {
     val user = sqls.createUnsafely(username)
-    sql"DROP ROLE IF EXISTS rds_iam".execute().apply()
-    sql"CREATE ROLE rds_iam".execute().apply()
-    sql"CREATE SEQUENCE IF NOT EXISTS consignment_sequence_id;".execute().apply()
+    sql"DROP ROLE IF EXISTS rds_iam".execute()
+    sql"CREATE ROLE rds_iam".execute()
+    sql"CREATE SEQUENCE IF NOT EXISTS consignment_sequence_id;".execute()
     val userCount = sql"SELECT count(*) as userCount FROM pg_roles WHERE rolname = $username".map(_.int("userCount")).list.apply.head
     if (userCount > 0) {
-      sql"SET ROLE tdr;".execute().apply()
+      sql"SET ROLE tdr;".execute()
       sql"REVOKE CONNECT ON DATABASE consignmentapi FROM $user;".execute.apply()
       sql"REVOKE USAGE ON SCHEMA public FROM $user;".execute.apply()
-      sql"SET ROLE migrations_user".execute().apply()
-      sql"ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE SELECT, INSERT, UPDATE ON TABLES FROM $user;".execute().apply()
-      sql"ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL PRIVILEGES ON SEQUENCES FROM $user;".execute().apply()
-      sql"SET ROLE tdr".execute().apply()
-      sql"REVOKE ALL PRIVILEGES ON consignment_sequence_id FROM $user;".execute().apply()
+      sql"SET ROLE migrations_user".execute()
+      sql"ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE SELECT, INSERT, UPDATE ON TABLES FROM $user;".execute()
+      sql"ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL PRIVILEGES ON SEQUENCES FROM $user;".execute()
+      sql"SET ROLE tdr".execute()
+      sql"REVOKE ALL PRIVILEGES ON consignment_sequence_id FROM $user;".execute()
       sql"REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM $user;".execute.apply()
-      sql"DROP TABLE IF EXISTS test;".execute().apply()
-      sql"DROP SEQUENCE IF EXISTS consignment_sequence_id".execute().apply()
-      sql"DROP USER IF EXISTS $user;".execute().apply()
+      sql"DROP TABLE IF EXISTS test;".execute()
+      sql"DROP SEQUENCE IF EXISTS consignment_sequence_id".execute()
+      sql"DROP USER IF EXISTS $user;".execute()
     }
   }
 
   def checkPrivileges(username: String, expectedPrivileges: List[String]): Assertion = {
-    sql"SET ROLE migrations_user;".execute().apply()
+    sql"SET ROLE migrations_user;".execute()
     val privileges: List[String] = sql"SELECT privilege_type FROM information_schema.table_privileges WHERE grantee=$username"
       .map(rs => rs.string("privilege_type"))
       .list.apply()
@@ -90,8 +90,8 @@ class LambdaSpec extends AnyFlatSpec with Matchers {
 
   def createTable(username: String) = {
     val user = sqls.createUnsafely(username)
-    sql"SET ROLE $user;".execute().apply()
-    sql"CREATE TABLE IF NOT EXISTS Test();".execute().apply()
+    sql"SET ROLE $user;".execute()
+    sql"CREATE TABLE IF NOT EXISTS Test();".execute()
   }
 
   "The process method" should "create the users with the correct parameters in the consignment database" in {
@@ -114,11 +114,11 @@ class LambdaSpec extends AnyFlatSpec with Matchers {
   }
 
   "The process method" should "create the users with the correct parameters for the bastion user" in {
-    sql"SET ROLE tdr;".execute().apply()
+    sql"SET ROLE tdr;".execute()
     prepareKmsMock()
     prepareConsignmentDb(lambdaConfig.bastionUser)
     createTable(lambdaConfig.migrationsUser)
-    sql"SET ROLE tdr;".execute().apply()
+    sql"SET ROLE tdr;".execute()
     new Lambda().createUsers("bastion")
     checkPrivileges(lambdaConfig.bastionUser, List("SELECT"))
     kmsWiremock.stop()

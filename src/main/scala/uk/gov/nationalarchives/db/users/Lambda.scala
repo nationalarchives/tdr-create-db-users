@@ -25,10 +25,11 @@ class Lambda {
   def createBastionUser: Boolean = {
     val user = createConsignmentApiUser(lambdaConfig.bastionUser)
     //Grant access to tables created before we started using the migrations user
-    sql"GRANT SELECT ON ALL TABLES IN SCHEMA public TO $user;".execute().apply()
-    sql"SET ROLE migrations_user;".execute().apply()
+    sql"GRANT SELECT ON ALL TABLES IN SCHEMA public TO $user;".execute()
+    sql"GRANT SELECT ON ALL TABLES IN SCHEMA public TO $user;".execute()
+    sql"SET ROLE migrations_user;".execute()
     //Grant access to tables created by the migrations user.
-    sql"GRANT SELECT ON ALL TABLES IN SCHEMA public TO $user;".execute().apply()
+    sql"GRANT SELECT ON ALL TABLES IN SCHEMA public TO $user;".execute()
   }
 
   def createKeycloakUser: Boolean = {
@@ -38,17 +39,17 @@ class Lambda {
       case None => throw new RuntimeException("Keycloak password has not been provided")
     }
     val password = sqls.createUnsafely(keycloakPassword)
-    sql"CREATE USER $user WITH PASSWORD '$password'".execute().apply()
+    sql"CREATE USER $user WITH PASSWORD '$password'".execute()
     grantConnectAndUsage(user, sqls.createUnsafely("keycloak"))
     sql"GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $user;".execute.apply()
     //Grant access to new tables. Keycloak upgrades sometimes create new tables
-    sql"ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES to $user".execute().apply()
+    sql"ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES to $user".execute()
   }
 
   def createConsignmentApiUsers: Boolean = {
     //Create the extension. This needs to be done by the admin user and this is the only script run by the admin user.
     val uuid = sqls.createUnsafely("uuid-ossp")
-    sql"""CREATE EXTENSION IF NOT EXISTS "$uuid" ;""".execute().apply()
+    sql"""CREATE EXTENSION IF NOT EXISTS "$uuid" ;""".execute()
 
     val migrationsUser = createConsignmentApiUser(lambdaConfig.migrationsUser)
     sql"GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $migrationsUser;".execute.apply()
@@ -57,14 +58,14 @@ class Lambda {
     val apiUser = createConsignmentApiUser(lambdaConfig.consignmentApiUser)
 
     //Switch to migrations user to set permissions on it's own tables correctly
-    sql"SET ROLE $migrationsUser".execute().apply()
+    sql"SET ROLE $migrationsUser".execute()
     sql"GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA public TO $apiUser;".execute.apply()
     sql"GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO $apiUser;".execute.apply()
 
     //Grants permissions for any new tables that are created.
     //This is not needed for the migrations user as it will be creating the tables so it will own them/
-    sql"ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE ON TABLES TO $apiUser;".execute().apply()
-    sql"ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON SEQUENCES TO $apiUser;".execute().apply()
+    sql"ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE ON TABLES TO $apiUser;".execute()
+    sql"ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON SEQUENCES TO $apiUser;".execute()
   }
 
   def grantConnectAndUsage(user: SQLSyntax, database: SQLSyntax) = {
@@ -76,9 +77,9 @@ class Lambda {
     //createUnsafely is needed as the usual interpolation returns ERROR: syntax error at or near "$1"
     //There is a similar issue here https://github.com/scalikejdbc/scalikejdbc/issues/320
     val user = sqls.createUnsafely(username)
-    sql"CREATE USER $user".execute().apply()
+    sql"CREATE USER $user".execute()
     grantConnectAndUsage(user, sqls.createUnsafely("consignmentapi"))
-    sql"GRANT rds_iam TO $user;".execute().apply()
+    sql"GRANT rds_iam TO $user;".execute()
     user
   }
 }
