@@ -21,9 +21,9 @@ lazy val root = (project in file("."))
     )
   )
 
-assemblyMergeStrategy in assembly := {
+(assembly / assemblyMergeStrategy) := {
   case PathList("META-INF", xs @ _*) => MergeStrategy.discard
   case _ => MergeStrategy.first
 }
 
-assemblyJarName in assembly := "create-db-users.jar"
+(assembly / assemblyJarName) := "create-db-users.jar"
