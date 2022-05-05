@@ -27,3 +27,7 @@ lazy val root = (project in file("."))
 }
 
 (assembly / assemblyJarName) := "create-db-users.jar"
+
+Test / fork := true
+Test / envVars := Map("AWS_ACCESS_KEY_ID" -> "test", "AWS_SECRET_ACCESS_KEY" -> "test")
+
