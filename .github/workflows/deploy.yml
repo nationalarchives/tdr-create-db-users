@@ -27,6 +27,7 @@ jobs:
       WORKFLOW_PAT: ${{ secrets.WORKFLOW_PAT }}
       SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
   deploy_db_users:
+    needs: deploy_keycloak_users
     uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_deploy.yml@main
     with:
       lambda-name: create-db-users
@@ -39,6 +40,7 @@ jobs:
       WORKFLOW_PAT: ${{ secrets.WORKFLOW_PAT }}
       SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
   deploy_bastion_user:
+    needs: deploy_db_users
     uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_deploy.yml@main
     with:
       lambda-name: create-bastion-user
