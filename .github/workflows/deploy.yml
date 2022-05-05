@@ -17,7 +17,7 @@ jobs:
   deploy_keycloak_users:
     uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_deploy.yml@main
     with:
-      lambda-name: create-keycloak-db-users
+      lambda-name: create-keycloak-db-user-new
       deployment-package: create-db-users.jar
       environment: ${{ github.event.inputs.environment }}
       to-deploy: ${{ github.event.inputs.to-deploy }}
