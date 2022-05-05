@@ -1,6 +1,5 @@
 name: TDR Deploy Create Database Users Lambda
 on:
-  push:
   workflow_dispatch:
     inputs:
       environment:
