@@ -2,7 +2,7 @@ import sbt._
 
 object Dependencies {
   lazy val awsUtils =  "uk.gov.nationalarchives" %% "tdr-aws-utils" % "0.1.31"
-  lazy val postgres = "org.postgresql" % "postgresql" % "42.3.5"
+  lazy val postgres = "org.postgresql" % "postgresql" % "42.3.6"
   lazy val scalaTest = "org.scalatest" %% "scalatest" % "3.2.12"
   lazy val scalikeJdbc = "org.scalikejdbc" %% "scalikejdbc" % "4.0.0"
   lazy val pureConfig = "com.github.pureconfig" %% "pureconfig" % "0.17.1"
