@@ -1,7 +1,7 @@
 import sbt._
 
 object Dependencies {
-  lazy val awsUtils =  "uk.gov.nationalarchives" %% "tdr-aws-utils" % "0.1.33"
+  lazy val awsUtils =  "uk.gov.nationalarchives" %% "tdr-aws-utils" % "0.1.34"
   lazy val postgres = "org.postgresql" % "postgresql" % "42.4.0"
   lazy val scalaTest = "org.scalatest" %% "scalatest" % "3.2.12"
   lazy val scalikeJdbc = "org.scalikejdbc" %% "scalikejdbc" % "4.0.0"
