@@ -34,12 +34,7 @@ class Lambda {
 
   def createKeycloakUser: Boolean = {
     val user = createIamAuthenticationUser(lambdaConfig.keycloakUser)
-    val keycloakPassword = lambdaConfig.keycloakPassword match {
-      case Some(value) => value
-      case None => throw new RuntimeException("Keycloak password has not been provided")
-    }
-    val password = sqls.createUnsafely(keycloakPassword)
-    sql"CREATE USER $user WITH PASSWORD '$password'".execute()
+
     grantConnectAndUsage(user, sqls.createUnsafely("keycloak"))
     sql"GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $user;".execute.apply()
     //Grant access to new tables. Keycloak upgrades sometimes create new tables
