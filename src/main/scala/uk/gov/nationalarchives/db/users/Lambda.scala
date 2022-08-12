@@ -23,7 +23,7 @@ class Lambda {
   }
 
   def createBastionUser: Boolean = {
-    val user = createConsignmentApiUser(lambdaConfig.bastionUser)
+    val user = createIamAuthenticationUser(lambdaConfig.bastionUser)
     //Grant access to tables created before we started using the migrations user
     sql"GRANT SELECT ON ALL TABLES IN SCHEMA public TO $user;".execute()
     sql"GRANT SELECT ON ALL TABLES IN SCHEMA public TO $user;".execute()
@@ -33,13 +33,8 @@ class Lambda {
   }
 
   def createKeycloakUser: Boolean = {
-    val user = sqls.createUnsafely(lambdaConfig.keycloakUser)
-    val keycloakPassword = lambdaConfig.keycloakPassword match {
-      case Some(value) => value
-      case None => throw new RuntimeException("Keycloak password has not been provided")
-    }
-    val password = sqls.createUnsafely(keycloakPassword)
-    sql"CREATE USER $user WITH PASSWORD '$password'".execute()
+    val user = createIamAuthenticationUser(lambdaConfig.keycloakUser)
+
     grantConnectAndUsage(user, sqls.createUnsafely("keycloak"))
     sql"GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $user;".execute.apply()
     //Grant access to new tables. Keycloak upgrades sometimes create new tables
@@ -51,11 +46,11 @@ class Lambda {
     val uuid = sqls.createUnsafely("uuid-ossp")
     sql"""CREATE EXTENSION IF NOT EXISTS "$uuid" ;""".execute()
 
-    val migrationsUser = createConsignmentApiUser(lambdaConfig.migrationsUser)
+    val migrationsUser = createIamAuthenticationUser(lambdaConfig.migrationsUser)
     sql"GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $migrationsUser;".execute.apply()
     sql"GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO $migrationsUser;".execute.apply()
 
-    val apiUser = createConsignmentApiUser(lambdaConfig.consignmentApiUser)
+    val apiUser = createIamAuthenticationUser(lambdaConfig.consignmentApiUser)
 
     //Switch to migrations user to set permissions on it's own tables correctly
     sql"SET ROLE $migrationsUser".execute()
@@ -73,7 +68,7 @@ class Lambda {
     sql"GRANT USAGE ON SCHEMA public TO $user;".execute.apply()
   }
 
-  def createConsignmentApiUser(username: String): SQLSyntax = {
+  def createIamAuthenticationUser(username: String): SQLSyntax = {
     //createUnsafely is needed as the usual interpolation returns ERROR: syntax error at or near "$1"
     //There is a similar issue here https://github.com/scalikejdbc/scalikejdbc/issues/320
     val user = sqls.createUnsafely(username)
