@@ -12,12 +12,15 @@ lazy val root = (project in file("."))
       "TDR Releases" at "s3://tdr-releases-mgmt"
     ),
     libraryDependencies ++= Seq(
-      awsUtils,
+      kmsUtils,
       pureConfig,
       postgres,
       scalikeJdbc,
       scalaTest % Test,
-      wiremock % Test
+      wiremock % Test,
+      circeCore % Test,
+      circeGeneric % Test,
+      circeParser % Test
     )
   )
 

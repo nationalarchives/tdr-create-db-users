@@ -3,8 +3,8 @@ package uk.gov.nationalarchives.db.users
 import pureconfig._
 import pureconfig.generic.auto._
 import scalikejdbc.{AutoSession, ConnectionPool}
-import uk.gov.nationalarchives.aws.utils.Clients.kms
-import uk.gov.nationalarchives.aws.utils.KMSUtils
+import uk.gov.nationalarchives.aws.utils.kms.KMSClients.kms
+import uk.gov.nationalarchives.aws.utils.kms.KMSUtils
 
 object Config {
 
