@@ -62,6 +62,10 @@ class Lambda {
     //This is not needed for the migrations user as it will be creating the tables so it will own them/
     sql"ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE ON TABLES TO $apiUser;".execute()
     sql"ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON SEQUENCES TO $apiUser;".execute()
+
+    // Grants permissions to delete file metadata and file status
+    sql"GRANT DELETE ON \"FileMetadata\" TO $apiUser;".execute()
+    sql"GRANT DELETE ON \"FileStatus\" TO $apiUser;".execute()
   }
 
   def grantConnectAndUsage(user: SQLSyntax, database: SQLSyntax) = {
