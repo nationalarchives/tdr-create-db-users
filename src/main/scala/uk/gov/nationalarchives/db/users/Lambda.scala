@@ -64,8 +64,8 @@ class Lambda {
     sql"ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON SEQUENCES TO $apiUser;".execute()
 
     // Grants permissions to delete file metadata and file status
-    sql"GRANT DELETE ON \"FileMetadata\" TO $apiUser;".execute()
-    sql"GRANT DELETE ON \"FileStatus\" TO $apiUser;".execute()
+    sql"""GRANT DELETE ON "FileMetadata" TO $apiUser;""".execute()
+    sql"""GRANT DELETE ON "FileStatus" TO $apiUser;""".execute()
   }
 
   def grantConnectAndUsage(user: SQLSyntax, database: SQLSyntax) = {
