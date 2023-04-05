@@ -11,7 +11,7 @@ If you want to run this against a local database, there are a few extra steps.
 
 Create the database if it doesn't exist. It will need the correct username and password. You can use docker
 
-`docker run --name postgres-db-users -e POSTGRES_PASSWORD=password -e POSTGRES_USER=tdr -e POSTGRES_DB=consignmentapi -d -p 5432:5432 postgres`
+`docker run --name postgres-db-users -e POSTGRES_PASSWORD=password -e POSTGRES_USER=tdr -e POSTGRES_DB=consignmentapi -d -p 5432:5432 postgres:14.4`
 
 Connect to the local database
 
