@@ -60,7 +60,7 @@ class Lambda {
 
     //Grants permissions for any new tables that are created.
     //This is not needed for the migrations user as it will be creating the tables so it will own them/
-    sql"ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE ON TABLES TO $apiUser;".execute()
+    sql"ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO $apiUser;".execute()
     sql"ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON SEQUENCES TO $apiUser;".execute()
   }
 

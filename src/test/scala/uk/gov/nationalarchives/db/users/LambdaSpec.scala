@@ -100,7 +100,7 @@ class LambdaSpec extends AnyFlatSpec with Matchers {
     prepareConsignmentDb(lambdaConfig.migrationsUser)
     new Lambda().createUsers("consignmentapi")
     createTable(lambdaConfig.migrationsUser)
-    checkPrivileges(lambdaConfig.consignmentApiUser, List("INSERT", "SELECT", "UPDATE"))
+    checkPrivileges(lambdaConfig.consignmentApiUser, List("DELETE", "INSERT", "SELECT", "UPDATE"))
     checkPrivileges(lambdaConfig.migrationsUser, List("DELETE", "INSERT", "REFERENCES", "SELECT", "TRIGGER", "TRUNCATE", "UPDATE"))
     kmsWiremock.stop()
   }
