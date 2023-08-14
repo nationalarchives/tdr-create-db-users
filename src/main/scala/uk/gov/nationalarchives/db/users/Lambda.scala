@@ -55,7 +55,7 @@ class Lambda {
 
     //Switch to migrations user to set permissions on it's own tables correctly
     sql"SET ROLE $migrationsUser".execute()
-    sql"GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA public TO $apiUser;".execute.apply()
+    sql"GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO $apiUser;".execute.apply()
     sql"GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO $apiUser;".execute.apply()
 
     //Grants permissions for any new tables that are created.
