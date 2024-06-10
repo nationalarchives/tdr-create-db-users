@@ -10,6 +10,6 @@ object Dependencies {
   lazy val postgres = "org.postgresql" % "postgresql" % "42.7.3"
   lazy val scalaTest = "org.scalatest" %% "scalatest" % "3.2.18"
   lazy val scalikeJdbc = "org.scalikejdbc" %% "scalikejdbc" % "4.3.0"
-  lazy val pureConfig = "com.github.pureconfig" %% "pureconfig" % "0.17.6"
+  lazy val pureConfig = "com.github.pureconfig" %% "pureconfig" % "0.17.7"
   lazy val wiremock = "com.github.tomakehurst" % "wiremock" % "3.0.1"
 }
