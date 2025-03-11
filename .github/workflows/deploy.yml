@@ -21,7 +21,7 @@ on:
         description: 'Bastion user version to deploy'
         required: true
 
-run-name: Deploying Create Database Users Lambdas ${{inputs.keycloak-to-deploy}}, ${{inputs.keycloak-to-deploy}} and ${{inputs.bastion-to-deploy}} to ${{inputs.environment}}
+run-name: Deploying Create Database Users Lambdas ${{inputs.keycloak-to-deploy}}, ${{inputs.db-to-deploy}} and ${{inputs.bastion-to-deploy}} to ${{inputs.environment}}
 permissions:
   id-token: write
   contents: write
