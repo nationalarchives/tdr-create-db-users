@@ -48,4 +48,3 @@ jobs:
       - run: gh workflow run deploy.yml --ref TDRD-666 -f environment=intg -f keycloak-to-deploy=${{ needs.pre-deploy-keycloak-users.outputs.next-version }} -f db-to-deploy=${{ needs.pre-deploy-db-users.outputs.next-version }} -f bastion-to-deploy=${{ needs.pre-deploy-bastion-user.outputs.next-version }}
         env:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_PAT }}
-          
