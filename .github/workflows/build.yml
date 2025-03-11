@@ -41,10 +41,11 @@ jobs:
       MANAGEMENT_ACCOUNT: ${{ secrets.MANAGEMENT_ACCOUNT }}
       WORKFLOW_PAT: ${{ secrets.WORKFLOW_PAT }}
   deploy:
-    needs: pre-deploy-bastion-user
+    needs: [pre-deploy-keycloak-users, pre-deploy-db-users, pre-deploy-bastion-user]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: gh workflow run deploy.yml --ref TDRD-666 -f environment=intg -f to-deploy=${{ needs.pre-deploy.outputs.next-version }}
+      - run: gh workflow run deploy.yml --ref TDRD-666 -f environment=intg -f keycloak-to-deploy=${{ needs.pre-deploy-keycloak-users.outputs.next-version }} -f db-to-deploy=${{ needs.pre-deploy-db-users.outputs.next-version }} -f bastion-to-deploy=${{ needs.pre-deploy-bastion-user.outputs.next-version }}
         env:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_PAT }}
+          
