@@ -11,11 +11,17 @@ on:
           - staging
           - prod
         default: 'intg'
-      to-deploy:
-        description: 'Version to deploy'
+      keycloak-to-deploy:
+        description: 'Keycloak user version to deploy'
+        required: true
+      db-to-deploy:
+        description: 'DB users version to deploy'
+        required: true 
+      bastion-to-deploy:
+        description: 'Bastion user version to deploy'
         required: true
 
-run-name: Deploying Create Database Users Lambda ${{inputs.to-deploy}} to ${{inputs.environment}}
+run-name: Deploying Create Database Users Lambdas ${{inputs.keycloak-to-deploy}}, ${{inputs.db-to-deploy}} and ${{inputs.bastion-to-deploy}} to ${{inputs.environment}}
 permissions:
   id-token: write
   contents: write
@@ -26,7 +32,7 @@ jobs:
       lambda-name: create-keycloak-user
       deployment-package: create-db-users.jar
       environment: ${{ github.event.inputs.environment }}
-      to-deploy: ${{ github.event.inputs.to-deploy }}
+      to-deploy: ${{ github.event.inputs.keycloak-to-deploy }}
     secrets:
       ACCOUNT_NUMBER: ${{ secrets.ACCOUNT_NUMBER }}
       MANAGEMENT_ACCOUNT: ${{ secrets.MANAGEMENT_ACCOUNT }}
@@ -39,7 +45,7 @@ jobs:
       lambda-name: create-db-users
       deployment-package: create-db-users.jar
       environment: ${{ github.event.inputs.environment }}
-      to-deploy: ${{ github.event.inputs.to-deploy }}
+      to-deploy: ${{ github.event.inputs.db-to-deploy }}
     secrets:
       ACCOUNT_NUMBER: ${{ secrets.ACCOUNT_NUMBER }}
       MANAGEMENT_ACCOUNT: ${{ secrets.MANAGEMENT_ACCOUNT }}
@@ -52,7 +58,7 @@ jobs:
       lambda-name: create-bastion-user
       deployment-package: create-db-users.jar
       environment: ${{ github.event.inputs.environment }}
-      to-deploy: ${{ github.event.inputs.to-deploy }}
+      to-deploy: ${{ github.event.inputs.bastion-to-deploy }}
     secrets:
       ACCOUNT_NUMBER: ${{ secrets.ACCOUNT_NUMBER }}
       MANAGEMENT_ACCOUNT: ${{ secrets.MANAGEMENT_ACCOUNT }}
