@@ -10,6 +10,7 @@ on:
           - intg
           - staging
           - prod
+          - test
         default: 'intg'
       keycloak-to-deploy:
         description: 'Keycloak user version to deploy'
