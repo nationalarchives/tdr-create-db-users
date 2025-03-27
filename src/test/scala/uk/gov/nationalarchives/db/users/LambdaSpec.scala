@@ -42,10 +42,11 @@ class LambdaSpec extends AnyFlatSpec with Matchers {
 
   val secretsManagerWiremock = new WireMockServer(new WireMockConfiguration().port(9002).extensions(new ResponseDefinitionTransformer {
     override def transform(request: Request, responseDefinition: ResponseDefinition, files: FileSource, parameters: Parameters): ResponseDefinition = {
-      ResponseDefinitionBuilder
+      val response = ResponseDefinitionBuilder
         .like(responseDefinition)
-        .withBody(s"""{"username": "username", "password": "password"}""")
-        .build()
+        .withHeader("Content-Type", "application/json")
+        .withBody("""{"SecretString": "{\"username\": \"username\", \"password\": \"password\"}"}""")        .build()
+      response
     }
     override def getName: String = ""
   }))
