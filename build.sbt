@@ -21,9 +21,7 @@ lazy val root = (project in file("."))
       circeGeneric,
       circeParser,
       scalaTest % Test,
-      wiremock % Test,
-      awsSso,
-      awsSSoidc
+      wiremock % Test
     )
   )
 
