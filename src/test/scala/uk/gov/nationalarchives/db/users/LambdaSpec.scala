@@ -39,9 +39,31 @@ class LambdaSpec extends AnyFlatSpec with Matchers {
     override def getName: String = ""
   }))
 
+
+  val secretsManagerWiremock = new WireMockServer(new WireMockConfiguration().port(9002).extensions(new ResponseDefinitionTransformer {
+    override def transform(request: Request, responseDefinition: ResponseDefinition, files: FileSource, parameters: Parameters): ResponseDefinition = {
+      case class SecretsManagerRequest(CiphertextBlob: String)
+      decode[SecretsManagerRequest](request.getBodyAsString) match {
+        case Left(err) => throw err
+        case Right(_) =>
+          ResponseDefinitionBuilder
+            .like(responseDefinition)
+            .withBody(s"""{"username": "username", "password": "password"}""")
+            .build()
+      }
+    }
+    override def getName: String = ""
+  }))
+
+
   def prepareKmsMock(): Unit = {
     kmsWiremock.stubFor(post(urlEqualTo("/")))
     kmsWiremock.start()
+  }
+
+  def prepareSecretsManagerMock(): Unit = {
+    secretsManagerWiremock.stubFor(post(urlEqualTo("/")))
+    secretsManagerWiremock.start()
   }
 
   def prepareKeycloakDb(username: String): AnyVal = {
