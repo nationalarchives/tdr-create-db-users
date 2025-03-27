@@ -45,7 +45,7 @@ class LambdaSpec extends AnyFlatSpec with Matchers {
       val response = ResponseDefinitionBuilder
         .like(responseDefinition)
         .withHeader("Content-Type", "application/json")
-        .withBody("""{"SecretString": "{\"username\": \"username\", \"password\": \"password\"}"}""")        .build()
+        .withBody("""{"SecretString": "{\"username\": \"tdr\", \"password\": \"password\"}"}""")        .build()
       response
     }
     override def getName: String = ""
