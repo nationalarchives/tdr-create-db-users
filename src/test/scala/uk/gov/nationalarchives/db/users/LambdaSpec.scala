@@ -118,6 +118,7 @@ class LambdaSpec extends AnyFlatSpec with Matchers {
 
   "The process method" should "create the users with the correct parameters in the consignment database" in {
     prepareKmsMock()
+    prepareSecretsManagerMock()
     prepareConsignmentDb(lambdaConfig.appConfig.consignmentApiUser)
     prepareConsignmentDb(lambdaConfig.appConfig.migrationsUser)
     new Lambda().createUsers("consignmentapi")
@@ -129,6 +130,7 @@ class LambdaSpec extends AnyFlatSpec with Matchers {
 
   "The process method" should "create the users with the correct parameters in the keycloak database" in {
     prepareKmsMock()
+    prepareSecretsManagerMock()
     prepareKeycloakDb(lambdaConfig.appConfig.keycloakUser)
     new Lambda().createUsers("keycloak")
     createTable(lambdaConfig.appConfig.keycloakUser)
@@ -138,6 +140,7 @@ class LambdaSpec extends AnyFlatSpec with Matchers {
   "The process method" should "create the users with the correct parameters for the bastion user" in {
     sql"SET ROLE tdr;".execute()
     prepareKmsMock()
+    prepareSecretsManagerMock()
     prepareConsignmentDb(lambdaConfig.appConfig.bastionUser)
     createTable(lambdaConfig.appConfig.migrationsUser)
     sql"SET ROLE tdr;".execute()
