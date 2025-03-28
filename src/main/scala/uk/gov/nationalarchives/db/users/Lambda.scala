@@ -9,7 +9,7 @@ import java.nio.charset.Charset
 class Lambda {
 
   def process(inputStream: InputStream, outputStream: OutputStream): Unit = {
-    createUsers(lambdaConfig.databaseName)
+    createUsers(lambdaConfig.appConfig.databaseName)
 
     outputStream.write("Users created successfully".getBytes(Charset.defaultCharset()))
   }
@@ -23,7 +23,7 @@ class Lambda {
   }
 
   def createBastionUser: Boolean = {
-    val user = createIamAuthenticationUser(lambdaConfig.bastionUser, "consignmentapi")
+    val user = createIamAuthenticationUser(lambdaConfig.appConfig.bastionUser, "consignmentapi")
     //Grant access to tables created before we started using the migrations user
     sql"GRANT SELECT ON ALL TABLES IN SCHEMA public TO $user;".execute()
     sql"GRANT SELECT ON ALL TABLES IN SCHEMA public TO $user;".execute()
@@ -33,7 +33,7 @@ class Lambda {
   }
 
   def createKeycloakUser: Boolean = {
-    val user = createIamAuthenticationUser(lambdaConfig.keycloakUser, "keycloak")
+    val user = createIamAuthenticationUser(lambdaConfig.appConfig.keycloakUser, "keycloak")
 
     grantConnectAndUsage(user, sqls.createUnsafely("keycloak"))
     sql"GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $user;".execute.apply()
@@ -47,11 +47,11 @@ class Lambda {
     val uuid = sqls.createUnsafely("uuid-ossp")
     sql"""CREATE EXTENSION IF NOT EXISTS "$uuid" ;""".execute()
 
-    val migrationsUser = createIamAuthenticationUser(lambdaConfig.migrationsUser, databaseName)
+    val migrationsUser = createIamAuthenticationUser(lambdaConfig.appConfig.migrationsUser, databaseName)
     sql"GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $migrationsUser;".execute.apply()
     sql"GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO $migrationsUser;".execute.apply()
 
-    val apiUser = createIamAuthenticationUser(lambdaConfig.consignmentApiUser, databaseName)
+    val apiUser = createIamAuthenticationUser(lambdaConfig.appConfig.consignmentApiUser, databaseName)
 
     //Switch to migrations user to set permissions on it's own tables correctly
     sql"SET ROLE $migrationsUser".execute()

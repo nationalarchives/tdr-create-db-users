@@ -38,10 +38,27 @@ class LambdaSpec extends AnyFlatSpec with Matchers {
     }
     override def getName: String = ""
   }))
+  
+  val secretsManagerWiremock = new WireMockServer(new WireMockConfiguration().port(9002).extensions(new ResponseDefinitionTransformer {
+    override def transform(request: Request, responseDefinition: ResponseDefinition, files: FileSource, parameters: Parameters): ResponseDefinition = {
+      val response = ResponseDefinitionBuilder
+        .like(responseDefinition)
+        .withHeader("Content-Type", "application/json")
+        .withBody("""{"SecretString": "{\"username\": \"tdr\", \"password\": \"password\"}"}""")        .build()
+      response
+    }
+    override def getName: String = ""
+  }))
+
 
   def prepareKmsMock(): Unit = {
     kmsWiremock.stubFor(post(urlEqualTo("/")))
     kmsWiremock.start()
+  }
+
+  def prepareSecretsManagerMock(): Unit = {
+    secretsManagerWiremock.stubFor(post(urlEqualTo("/")))
+    secretsManagerWiremock.start()
   }
 
   def prepareKeycloakDb(username: String): AnyVal = {
@@ -96,31 +113,34 @@ class LambdaSpec extends AnyFlatSpec with Matchers {
 
   "The process method" should "create the users with the correct parameters in the consignment database" in {
     prepareKmsMock()
-    prepareConsignmentDb(lambdaConfig.consignmentApiUser)
-    prepareConsignmentDb(lambdaConfig.migrationsUser)
+    prepareSecretsManagerMock()
+    prepareConsignmentDb(lambdaConfig.appConfig.consignmentApiUser)
+    prepareConsignmentDb(lambdaConfig.appConfig.migrationsUser)
     new Lambda().createUsers("consignmentapi")
-    createTable(lambdaConfig.migrationsUser)
-    checkPrivileges(lambdaConfig.consignmentApiUser, List("DELETE", "INSERT", "SELECT", "UPDATE"))
-    checkPrivileges(lambdaConfig.migrationsUser, List("DELETE", "INSERT", "REFERENCES", "SELECT", "TRIGGER", "TRUNCATE", "UPDATE"))
+    createTable(lambdaConfig.appConfig.migrationsUser)
+    checkPrivileges(lambdaConfig.appConfig.consignmentApiUser, List("DELETE", "INSERT", "SELECT", "UPDATE"))
+    checkPrivileges(lambdaConfig.appConfig.migrationsUser, List("DELETE", "INSERT", "REFERENCES", "SELECT", "TRIGGER", "TRUNCATE", "UPDATE"))
     kmsWiremock.stop()
   }
 
   "The process method" should "create the users with the correct parameters in the keycloak database" in {
     prepareKmsMock()
-    prepareKeycloakDb(lambdaConfig.keycloakUser)
+    prepareSecretsManagerMock()
+    prepareKeycloakDb(lambdaConfig.appConfig.keycloakUser)
     new Lambda().createUsers("keycloak")
-    createTable(lambdaConfig.keycloakUser)
-    checkPrivileges(lambdaConfig.keycloakUser, List("DELETE", "INSERT", "REFERENCES", "SELECT", "TRIGGER", "TRUNCATE", "UPDATE"))
+    createTable(lambdaConfig.appConfig.keycloakUser)
+    checkPrivileges(lambdaConfig.appConfig.keycloakUser, List("DELETE", "INSERT", "REFERENCES", "SELECT", "TRIGGER", "TRUNCATE", "UPDATE"))
   }
 
   "The process method" should "create the users with the correct parameters for the bastion user" in {
     sql"SET ROLE tdr;".execute()
     prepareKmsMock()
-    prepareConsignmentDb(lambdaConfig.bastionUser)
-    createTable(lambdaConfig.migrationsUser)
+    prepareSecretsManagerMock()
+    prepareConsignmentDb(lambdaConfig.appConfig.bastionUser)
+    createTable(lambdaConfig.appConfig.migrationsUser)
     sql"SET ROLE tdr;".execute()
     new Lambda().createUsers("bastion")
-    checkPrivileges(lambdaConfig.bastionUser, List("SELECT"))
+    checkPrivileges(lambdaConfig.appConfig.bastionUser, List("SELECT"))
     kmsWiremock.stop()
   }
 }
