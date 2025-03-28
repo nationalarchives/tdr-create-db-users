@@ -38,8 +38,7 @@ class LambdaSpec extends AnyFlatSpec with Matchers {
     }
     override def getName: String = ""
   }))
-
-
+  
   val secretsManagerWiremock = new WireMockServer(new WireMockConfiguration().port(9002).extensions(new ResponseDefinitionTransformer {
     override def transform(request: Request, responseDefinition: ResponseDefinition, files: FileSource, parameters: Parameters): ResponseDefinition = {
       val response = ResponseDefinitionBuilder
