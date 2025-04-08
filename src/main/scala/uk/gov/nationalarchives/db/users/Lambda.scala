@@ -39,6 +39,8 @@ class Lambda {
     sql"GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $user;".execute.apply()
     //Grant access to new tables. Keycloak upgrades sometimes create new tables
     sql"ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES to $user".execute()
+    // Required when Keycloak spins up for the first time
+    sql"GRANT CREATE ON SCHEMA public TO $user;".execute.apply()
   }
 
   def createConsignmentApiUsers: Boolean = {
