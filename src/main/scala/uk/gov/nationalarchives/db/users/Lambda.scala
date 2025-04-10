@@ -52,6 +52,7 @@ class Lambda {
     val migrationsUser = createIamAuthenticationUser(lambdaConfig.appConfig.migrationsUser, databaseName)
     sql"GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $migrationsUser;".execute.apply()
     sql"GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO $migrationsUser;".execute.apply()
+    sql"GRANT CREATE ON SCHEMA public TO $migrationsUser;".execute.apply()
 
     val apiUser = createIamAuthenticationUser(lambdaConfig.appConfig.consignmentApiUser, databaseName)
 
