@@ -39,6 +39,8 @@ class Lambda {
     sql"GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $user;".execute.apply()
     //Grant access to new tables. Keycloak upgrades sometimes create new tables
     sql"ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES to $user".execute()
+    // Required when Keycloak spins up for the first time
+    sql"GRANT CREATE ON SCHEMA public TO $user;".execute.apply()
   }
 
   def createConsignmentApiUsers: Boolean = {
@@ -50,6 +52,7 @@ class Lambda {
     val migrationsUser = createIamAuthenticationUser(lambdaConfig.appConfig.migrationsUser, databaseName)
     sql"GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $migrationsUser;".execute.apply()
     sql"GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO $migrationsUser;".execute.apply()
+    sql"GRANT CREATE ON SCHEMA public TO $migrationsUser;".execute.apply()
 
     val apiUser = createIamAuthenticationUser(lambdaConfig.appConfig.consignmentApiUser, databaseName)
 
