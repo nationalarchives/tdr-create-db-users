@@ -27,7 +27,7 @@ permissions:
   contents: write
 jobs:
   deploy_keycloak_users:
-    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_deploy.yml@5d4fee21ed08f053613a7706e28623c0adc0f5f4 # v0.0.10
+    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_deploy.yml@f52edf22c81f568202369a3b31da0277541b0507 # v0.0.11
     with:
       lambda-name: create-keycloak-user
       deployment-package: create-db-users.jar
@@ -40,7 +40,7 @@ jobs:
       SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
   deploy_db_users:
     needs: deploy_keycloak_users
-    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_deploy.yml@5d4fee21ed08f053613a7706e28623c0adc0f5f4 # v0.0.10
+    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_deploy.yml@f52edf22c81f568202369a3b31da0277541b0507 # v0.0.11
     with:
       lambda-name: create-db-users
       deployment-package: create-db-users.jar
@@ -53,7 +53,7 @@ jobs:
       SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
   deploy_bastion_user:
     needs: deploy_db_users
-    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_deploy.yml@5d4fee21ed08f053613a7706e28623c0adc0f5f4 # v0.0.10
+    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_deploy.yml@f52edf22c81f568202369a3b31da0277541b0507 # v0.0.11
     with:
       lambda-name: create-bastion-user
       deployment-package: create-db-users.jar
