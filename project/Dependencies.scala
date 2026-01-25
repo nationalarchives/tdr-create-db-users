@@ -7,7 +7,7 @@ object Dependencies {
   lazy val circeGeneric = "io.circe" %% "circe-generic" % circeVersion
   lazy val circeParser = "io.circe" %% "circe-parser" % circeVersion
   lazy val kmsUtils =  "uk.gov.nationalarchives" %% "kms-utils" % "0.1.316"
-  lazy val secretsManagerUtils =  "uk.gov.nationalarchives" %% "secretsmanager-utils" % "0.1.315"
+  lazy val secretsManagerUtils =  "uk.gov.nationalarchives" %% "secretsmanager-utils" % "0.1.316"
   lazy val postgres = "org.postgresql" % "postgresql" % "42.7.9"
   lazy val scalaTest = "org.scalatest" %% "scalatest" % "3.2.19"
   lazy val scalikeJdbc = "org.scalikejdbc" %% "scalikejdbc" % "4.3.5"
