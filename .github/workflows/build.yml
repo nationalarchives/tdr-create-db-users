@@ -5,7 +5,7 @@ on:
       - main
 jobs:
   pre-deploy-keycloak-user:
-    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_build.yml@f52edf22c81f568202369a3b31da0277541b0507 # v0.0.11
+    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_build.yml@cd362ffa9386c007c816bfd15a25b6f0a3c3b3d6 # v0.0.14
     with:
       lambda-name: create-keycloak-user
       repo-name: tdr-create-db-users
@@ -17,7 +17,7 @@ jobs:
       WORKFLOW_PAT: ${{ secrets.WORKFLOW_PAT }}
   pre-deploy-db-users:
     needs: pre-deploy-keycloak-user
-    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_build.yml@f52edf22c81f568202369a3b31da0277541b0507 # v0.0.11
+    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_build.yml@cd362ffa9386c007c816bfd15a25b6f0a3c3b3d6 # v0.0.14
     with:
       lambda-name: create-db-users
       repo-name: tdr-create-db-users
@@ -29,7 +29,7 @@ jobs:
       WORKFLOW_PAT: ${{ secrets.WORKFLOW_PAT }}
   pre-deploy-bastion-user:
     needs: pre-deploy-db-users
-    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_build.yml@f52edf22c81f568202369a3b31da0277541b0507 # v0.0.11
+    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_build.yml@cd362ffa9386c007c816bfd15a25b6f0a3c3b3d6 # v0.0.14
     with:
       lambda-name: create-bastion-user
       repo-name: tdr-create-db-users
@@ -43,7 +43,7 @@ jobs:
     needs: [pre-deploy-keycloak-user, pre-deploy-db-users, pre-deploy-bastion-user]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - run: gh workflow run deploy.yml -f environment=intg -f keycloak-to-deploy=${{ needs.pre-deploy-keycloak-user.outputs.next-version }} -f db-to-deploy=${{ needs.pre-deploy-db-users.outputs.next-version }} -f bastion-to-deploy=${{ needs.pre-deploy-bastion-user.outputs.next-version }}
         env:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_PAT }}
