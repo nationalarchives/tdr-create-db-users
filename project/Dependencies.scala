@@ -9,7 +9,7 @@ object Dependencies {
   lazy val kmsUtils =  "uk.gov.nationalarchives" %% "kms-utils" % "0.1.320"
   lazy val secretsManagerUtils =  "uk.gov.nationalarchives" %% "secretsmanager-utils" % "0.1.320"
   lazy val postgres = "org.postgresql" % "postgresql" % "42.7.10"
-  lazy val scalaTest = "org.scalatest" %% "scalatest" % "3.2.19"
+  lazy val scalaTest = "org.scalatest" %% "scalatest" % "3.2.20"
   lazy val scalikeJdbc = "org.scalikejdbc" %% "scalikejdbc" % "4.3.5"
   lazy val pureConfig = "com.github.pureconfig" %% "pureconfig" % "0.17.10"
   lazy val wiremock = "com.github.tomakehurst" % "wiremock" % "3.0.1"
