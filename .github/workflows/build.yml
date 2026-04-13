@@ -9,7 +9,7 @@ jobs:
     permissions:
       id-token: write
       contents: write
-    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_build.yml@683912c0ebb8d5d6edd15a222677395e95d12ce0 # v0.0.24
+    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_build.yml@27efbc03aaaa9696eea85ab7a9363d6f92733471 # v0.0.34
     with:
       lambda-name: create-keycloak-user
       repo-name: tdr-create-db-users
@@ -24,7 +24,7 @@ jobs:
     permissions:
       id-token: write
       contents: write
-    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_build.yml@683912c0ebb8d5d6edd15a222677395e95d12ce0 # v0.0.24
+    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_build.yml@27efbc03aaaa9696eea85ab7a9363d6f92733471 # v0.0.34
     with:
       lambda-name: create-db-users
       repo-name: tdr-create-db-users
@@ -39,7 +39,7 @@ jobs:
     permissions:
       id-token: write
       contents: write
-    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_build.yml@683912c0ebb8d5d6edd15a222677395e95d12ce0 # v0.0.24
+    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_build.yml@27efbc03aaaa9696eea85ab7a9363d6f92733471 # v0.0.34
     with:
       lambda-name: create-bastion-user
       repo-name: tdr-create-db-users
