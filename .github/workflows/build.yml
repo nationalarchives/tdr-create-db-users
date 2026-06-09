@@ -34,23 +34,8 @@ jobs:
     secrets:
       MANAGEMENT_ACCOUNT: ${{ secrets.MANAGEMENT_ACCOUNT }}
       WORKFLOW_PAT: ${{ secrets.WORKFLOW_PAT }}
-  pre-deploy-bastion-user:
-    needs: pre-deploy-db-users
-    permissions:
-      id-token: write
-      contents: write
-    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_build.yml@e7b57a3bdf7863c951cd203101c6d566986376e3 # v0.0.38
-    with:
-      lambda-name: create-bastion-user
-      repo-name: tdr-create-db-users
-      artifact-name: create-db-users
-      build-command: |
-        sbt assembly
-    secrets:
-      MANAGEMENT_ACCOUNT: ${{ secrets.MANAGEMENT_ACCOUNT }}
-      WORKFLOW_PAT: ${{ secrets.WORKFLOW_PAT }}
   deploy:
-    needs: [pre-deploy-keycloak-user, pre-deploy-db-users, pre-deploy-bastion-user]
+    needs: [pre-deploy-keycloak-user, pre-deploy-db-users]
     permissions:
       contents: read
     runs-on: ubuntu-latest
@@ -58,9 +43,8 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
-      - run: gh workflow run deploy.yml -f environment=intg -f keycloak-to-deploy="$KEYCLOAK_VERSION" -f db-to-deploy="$DB_VERSION" -f bastion-to-deploy="$BASTION_VERSION"
+      - run: gh workflow run deploy.yml -f environment=intg -f keycloak-to-deploy="$KEYCLOAK_VERSION" -f db-to-deploy="$DB_VERSION""
         env:
           KEYCLOAK_VERSION: ${{ needs.pre-deploy-keycloak-user.outputs.next-version }}
           DB_VERSION: ${{ needs.pre-deploy-db-users.outputs.next-version }}
-          BASTION_VERSION: ${{ needs.pre-deploy-bastion-user.outputs.next-version }}
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_PAT }}

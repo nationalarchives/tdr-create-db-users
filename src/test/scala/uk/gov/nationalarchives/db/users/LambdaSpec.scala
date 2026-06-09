@@ -131,16 +131,4 @@ class LambdaSpec extends AnyFlatSpec with Matchers {
     createTable(lambdaConfig.appConfig.keycloakUser)
     checkPrivileges(lambdaConfig.appConfig.keycloakUser, List("DELETE", "INSERT", "REFERENCES", "SELECT", "TRIGGER", "TRUNCATE", "UPDATE"))
   }
-
-  "The process method" should "create the users with the correct parameters for the bastion user" in {
-    sql"SET ROLE tdr;".execute()
-    prepareKmsMock()
-    prepareSecretsManagerMock()
-    prepareConsignmentDb(lambdaConfig.appConfig.bastionUser)
-    createTable(lambdaConfig.appConfig.migrationsUser)
-    sql"SET ROLE tdr;".execute()
-    new Lambda().createUsers("bastion")
-    checkPrivileges(lambdaConfig.appConfig.bastionUser, List("SELECT"))
-    kmsWiremock.stop()
-  }
 }

@@ -18,18 +18,7 @@ class Lambda {
     databaseName match {
       case "consignmentapi" => createConsignmentApiUsers
       case "keycloak" => createKeycloakUser
-      case "bastion" => createBastionUser
     }
-  }
-
-  def createBastionUser: Boolean = {
-    val user = createIamAuthenticationUser(lambdaConfig.appConfig.bastionUser, "consignmentapi")
-    //Grant access to tables created before we started using the migrations user
-    sql"GRANT SELECT ON ALL TABLES IN SCHEMA public TO $user;".execute()
-    sql"GRANT SELECT ON ALL TABLES IN SCHEMA public TO $user;".execute()
-    sql"SET ROLE migrations_user;".execute()
-    //Grant access to tables created by the migrations user.
-    sql"GRANT SELECT ON ALL TABLES IN SCHEMA public TO $user;".execute()
   }
 
   def createKeycloakUser: Boolean = {
