@@ -15,7 +15,7 @@ on:
       # keycloak-to-deploy:
         # description: 'Keycloak user version to deploy'
         # required: true
-      # db-to-deploy:
+      db-to-deploy:
         description: 'DB users version to deploy'
         required: true
 run-name: Deploying Create Database Users Lambdas ${{inputs.keycloak-to-deploy}} and ${{inputs.db-to-deploy}} to ${{inputs.environment}}
