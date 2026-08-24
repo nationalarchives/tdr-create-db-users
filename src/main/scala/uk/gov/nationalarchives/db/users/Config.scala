@@ -13,7 +13,7 @@ import uk.gov.nationalarchives.aws.utils.secretsmanager.SecretsManagerUtils
 object Config {
   
   case class LambdaConfig(credentials: Credentials, appConfig: ApplicationConfig)
-  case class ApplicationConfig(driver: String, dbSecretsArn: String, url: String, consignmentApiUser: String, migrationsUser: String, functionName: String, kmsEndpoint: String, secretsManagerEndpoint: String, databaseName: String, keycloakUser: String, keycloakPassword: Option[String], bastionUser: String)
+  case class ApplicationConfig(driver: String, dbSecretsArn: String, url: String, consignmentApiUser: String, migrationsUser: String, functionName: String, kmsEndpoint: String, secretsManagerEndpoint: String, databaseName: String, keycloakUser: String, keycloakPassword: Option[String])
   case class Credentials(username: String, password: String)
 
   implicit val credentialsDecoder: Decoder[Credentials] = deriveDecoder[Credentials]
