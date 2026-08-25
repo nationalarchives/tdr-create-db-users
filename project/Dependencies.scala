@@ -1,7 +1,7 @@
 import sbt._
 
 object Dependencies {
-  private val circeVersion = "0.14.15"
+  private val circeVersion = "0.14.16"
   private val tdrAwsUtilsVersion = "0.1.336"
 
   lazy val circeCore = "io.circe" %% "circe-core" % circeVersion
