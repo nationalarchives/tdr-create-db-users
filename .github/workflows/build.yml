@@ -29,7 +29,7 @@ jobs:
     uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_build.yml@b469512bc31f0425270a12b87ebe68807c3a1daf # v0.0.46
     with:
       lambda-name: create-db-users
-      java-version: $JAVA_RUNTIME
+      java-version: ${{vars.JAVA_RUNTIME}}
       repo-name: tdr-create-db-users
       artifact-name: create-db-users
       build-command: |
@@ -37,7 +37,6 @@ jobs:
     secrets:
       MANAGEMENT_ACCOUNT: ${{ secrets.MANAGEMENT_ACCOUNT }}
       WORKFLOW_PAT: ${{ secrets.WORKFLOW_PAT }}
-      JAVA_RUNTIME: ${{ secrets.JAVA_RUNTIME }}
   deploy:
     needs: [pre-deploy-keycloak-user, pre-deploy-db-users]
     permissions:
