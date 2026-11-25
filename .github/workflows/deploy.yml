@@ -37,6 +37,7 @@ jobs:
       deployment-package: create-db-users.jar
       environment: ${{ github.event.inputs.environment }}
       to-deploy: ${{ github.event.inputs.keycloak-to-deploy }}
+      account-regional-code-bucket: ${{ inputs.account-regional-code-bucket }}
     secrets:
       ACCOUNT_NUMBER: ${{ secrets.ACCOUNT_NUMBER }}
       MANAGEMENT_ACCOUNT: ${{ secrets.MANAGEMENT_ACCOUNT }}
