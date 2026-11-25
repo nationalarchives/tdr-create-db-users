@@ -32,7 +32,7 @@ jobs:
     permissions:
       id-token: write
       contents: write
-    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_build.yml@73f166c1ea66e46448b63d57a8c7c616d11ac180 # v0.0.46
+    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_build.yml@22a3b4cf224068ab00113985cc6d3343208ed5a2 # v0.0.46
     with:
       lambda-name: create-keycloak-user
       java-version: ${{vars.JAVA_RUNTIME}}
@@ -51,7 +51,7 @@ jobs:
     permissions:
       id-token: write
       contents: write
-    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_build.yml@73f166c1ea66e46448b63d57a8c7c616d11ac180 # v0.0.46
+    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_build.yml@22a3b4cf224068ab00113985cc6d3343208ed5a2 # v0.0.46
     with:
       lambda-name: create-db-users
       java-version: ${{vars.JAVA_RUNTIME}}
