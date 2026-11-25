@@ -30,6 +30,7 @@ jobs:
       build-command: |
         sbt assembly
       account-regional-code-bucket: ${{ inputs.account-regional-code-bucket }}
+      snapshot: ${{ inputs.snapshot }}
     secrets:
       MANAGEMENT_ACCOUNT: ${{ secrets.MANAGEMENT_ACCOUNT }}
       WORKFLOW_PAT: ${{ secrets.WORKFLOW_PAT }}
@@ -47,6 +48,7 @@ jobs:
       build-command: |
         sbt assembly
       account-regional-code-bucket: ${{ inputs.account-regional-code-bucket }}
+      snapshot: ${{ inputs.snapshot }}
     secrets:
       MANAGEMENT_ACCOUNT: ${{ secrets.MANAGEMENT_ACCOUNT }}
       WORKFLOW_PAT: ${{ secrets.WORKFLOW_PAT }}
