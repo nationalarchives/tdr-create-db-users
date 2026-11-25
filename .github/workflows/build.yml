@@ -74,9 +74,15 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - run: gh workflow run deploy.yml -f environment=drdev -f keycloak-to-deploy="$KEYCLOAK_VERSION" -f db-to-deploy="$DB_VERSION" -f account-regional-code-bucket=true
+      - run: |
+          gh workflow run deploy.yml --ref "$WORKFLOW_REF" \
+            -f environment=drdev \
+            -f keycloak-to-deploy="$KEYCLOAK_VERSION" \
+            -f db-to-deploy="$DB_VERSION" \
+            -f account-regional-code-bucket=true
         env:
           KEYCLOAK_VERSION: ${{ needs.pre-deploy-keycloak-user.outputs.next-version }}
           DB_VERSION: ${{ needs.pre-deploy-db-users.outputs.next-version }}
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_PAT }}
           SNAPSHOT: ${{ inputs.snapshot == true }}
+          WORKFLOW_REF: ${{ github.ref_name }}
