@@ -31,7 +31,7 @@ jobs:
     permissions:
       id-token: write
       contents: write
-    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_deploy.yml@9e689c79b4737abc1bca4f8acd4c25489a2432e7 # v0.0.46
+    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_deploy.yml@43f73a49de3676ff23a624cd214de71c7f8e5480 # v0.0.46
     with:
       lambda-name: create-keycloak-user
       deployment-package: create-db-users.jar
@@ -48,7 +48,7 @@ jobs:
     permissions:
       id-token: write
       contents: write
-    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_deploy.yml@9e689c79b4737abc1bca4f8acd4c25489a2432e7 # v0.0.46
+    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_deploy.yml@43f73a49de3676ff23a624cd214de71c7f8e5480 # v0.0.46
     with:
       lambda-name: create-db-users
       deployment-package: create-db-users.jar
