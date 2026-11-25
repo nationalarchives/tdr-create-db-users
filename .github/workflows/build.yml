@@ -3,13 +3,25 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      snapshot:
+        description: 'Build a dev snapshot from the current branch instead of the next release version'
+        type: boolean
+        required: false
+        default: false
+      account-regional-code-bucket:
+        description: 'Code bucket uses account regional namespace'
+        type: boolean
+        required: false
+        default: false
 permissions: {}
 jobs:
   pre-deploy-keycloak-user:
     permissions:
       id-token: write
       contents: write
-    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_build.yml@b469512bc31f0425270a12b87ebe68807c3a1daf # v0.0.46
+    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_build.yml@660c4e820430fa17bedb491482072a065be85ed3 # v0.0.46
     with:
       lambda-name: create-keycloak-user
       java-version: ${{vars.JAVA_RUNTIME}}
@@ -17,6 +29,7 @@ jobs:
       artifact-name: create-db-users
       build-command: |
         sbt assembly
+      account-regional-code-bucket: ${{ inputs.account-regional-code-bucket }}
     secrets:
       MANAGEMENT_ACCOUNT: ${{ secrets.MANAGEMENT_ACCOUNT }}
       WORKFLOW_PAT: ${{ secrets.WORKFLOW_PAT }}
@@ -25,7 +38,7 @@ jobs:
     permissions:
       id-token: write
       contents: write
-    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_build.yml@b469512bc31f0425270a12b87ebe68807c3a1daf # v0.0.46
+    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_build.yml@660c4e820430fa17bedb491482072a065be85ed3 # v0.0.46
     with:
       lambda-name: create-db-users
       java-version: ${{vars.JAVA_RUNTIME}}
@@ -33,6 +46,7 @@ jobs:
       artifact-name: create-db-users
       build-command: |
         sbt assembly
+      account-regional-code-bucket: ${{ inputs.account-regional-code-bucket }}
     secrets:
       MANAGEMENT_ACCOUNT: ${{ secrets.MANAGEMENT_ACCOUNT }}
       WORKFLOW_PAT: ${{ secrets.WORKFLOW_PAT }}
@@ -45,7 +59,12 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - run: gh workflow run deploy.yml -f environment=intg -f keycloak-to-deploy="$KEYCLOAK_VERSION" -f db-to-deploy="$DB_VERSION"
+      - run: |
+          if [ "$SNAPSHOT" = "true" ]; then
+            gh workflow run deploy.yml -f environment=drdev -f keycloak-to-deploy="$KEYCLOAK_VERSION" -f db-to-deploy="$DB_VERSION"
+          else
+            gh workflow run deploy.yml -f environment=intg -f keycloak-to-deploy="$KEYCLOAK_VERSION" -f db-to-deploy="$DB_VERSION"
+          fi
         env:
           KEYCLOAK_VERSION: ${{ needs.pre-deploy-keycloak-user.outputs.next-version }}
           DB_VERSION: ${{ needs.pre-deploy-db-users.outputs.next-version }}

@@ -19,6 +19,11 @@ on:
       db-to-deploy:
         description: 'DB users version to deploy'
         required: true
+      account-regional-code-bucket:
+        description: 'Code bucket uses account regional namespace'
+        type: boolean
+        required: false
+        default: false
 run-name: Deploying Create Database Users Lambdas ${{inputs.keycloak-to-deploy}} and ${{inputs.db-to-deploy}} to ${{inputs.environment}}
 permissions: {}
 jobs:
@@ -42,12 +47,13 @@ jobs:
     permissions:
       id-token: write
       contents: write
-    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_deploy.yml@b469512bc31f0425270a12b87ebe68807c3a1daf # v0.0.46
+    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_deploy.yml@660c4e820430fa17bedb491482072a065be85ed3 # v0.0.46
     with:
       lambda-name: create-db-users
       deployment-package: create-db-users.jar
       environment: ${{ github.event.inputs.environment }}
       to-deploy: ${{ github.event.inputs.db-to-deploy }}
+      account-regional-code-bucket: ${{ inputs.account-regional-code-bucket }}
     secrets:
       ACCOUNT_NUMBER: ${{ secrets.ACCOUNT_NUMBER }}
       MANAGEMENT_ACCOUNT: ${{ secrets.MANAGEMENT_ACCOUNT }}
