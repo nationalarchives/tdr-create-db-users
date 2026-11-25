@@ -5,6 +5,17 @@ on:
       - main
   workflow_dispatch:
     inputs:
+      environment:
+        type: choice
+        description: 'Environment'
+        required: true
+        options:
+          - intg
+          - staging
+          - prod
+          - dev
+          - drdev
+        default: 'drdev'
       snapshot:
         description: 'Build a dev snapshot from the current branch instead of the next release version'
         type: boolean
@@ -15,13 +26,13 @@ on:
         type: boolean
         required: false
         default: false
-permissions: {}
+permissions: { }
 jobs:
   pre-deploy-keycloak-user:
     permissions:
       id-token: write
       contents: write
-    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_build.yml@660c4e820430fa17bedb491482072a065be85ed3 # v0.0.46
+    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_build.yml@298c59a1eea3dae2e333d80a8d14eb4885314398 # v0.0.46
     with:
       lambda-name: create-keycloak-user
       java-version: ${{vars.JAVA_RUNTIME}}
@@ -31,15 +42,15 @@ jobs:
         sbt assembly
       account-regional-code-bucket: ${{ inputs.account-regional-code-bucket }}
       snapshot: ${{ inputs.snapshot }}
+      environment: ${{ inputs.environment }}
     secrets:
-      MANAGEMENT_ACCOUNT: ${{ secrets.MANAGEMENT_ACCOUNT }}
       WORKFLOW_PAT: ${{ secrets.WORKFLOW_PAT }}
   pre-deploy-db-users:
     needs: pre-deploy-keycloak-user
     permissions:
       id-token: write
       contents: write
-    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_build.yml@660c4e820430fa17bedb491482072a065be85ed3 # v0.0.46
+    uses: nationalarchives/tdr-github-actions/.github/workflows/lambda_build.yml@298c59a1eea3dae2e333d80a8d14eb4885314398 # v0.0.46
     with:
       lambda-name: create-db-users
       java-version: ${{vars.JAVA_RUNTIME}}
@@ -49,8 +60,8 @@ jobs:
         sbt assembly
       account-regional-code-bucket: ${{ inputs.account-regional-code-bucket }}
       snapshot: ${{ inputs.snapshot }}
+      environment: ${{ inputs.environment }}
     secrets:
-      MANAGEMENT_ACCOUNT: ${{ secrets.MANAGEMENT_ACCOUNT }}
       WORKFLOW_PAT: ${{ secrets.WORKFLOW_PAT }}
 #  deploy:
 #    needs: [pre-deploy-keycloak-user, pre-deploy-db-users]
