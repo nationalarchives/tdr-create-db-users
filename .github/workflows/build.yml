@@ -65,22 +65,18 @@ jobs:
     secrets:
       MANAGEMENT_ACCOUNT: ${{ secrets.MANAGEMENT_ACCOUNT }}
       WORKFLOW_PAT: ${{ secrets.WORKFLOW_PAT }}
-#  deploy:
-#    needs: [pre-deploy-keycloak-user, pre-deploy-db-users]
-#    permissions:
-#      contents: read
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-#        with:
-#          persist-credentials: false
-#      - run: |
-#          if [ "$SNAPSHOT" = "true" ]; then
-#            gh workflow run deploy.yml -f environment=drdev -f keycloak-to-deploy="$KEYCLOAK_VERSION" -f db-to-deploy="$DB_VERSION"
-#          else
-#            gh workflow run deploy.yml -f environment=intg -f keycloak-to-deploy="$KEYCLOAK_VERSION" -f db-to-deploy="$DB_VERSION"
-#          fi
-#        env:
-#          KEYCLOAK_VERSION: ${{ needs.pre-deploy-keycloak-user.outputs.next-version }}
-#          DB_VERSION: ${{ needs.pre-deploy-db-users.outputs.next-version }}
-#          GITHUB_TOKEN: ${{ secrets.WORKFLOW_PAT }}
+  deploy:
+    needs: [pre-deploy-keycloak-user, pre-deploy-db-users]
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: gh workflow run deploy.yml -f environment=drdev -f keycloak-to-deploy="$KEYCLOAK_VERSION" -f db-to-deploy="$DB_VERSION" -f account-regional-code-bucket=true
+        env:
+          KEYCLOAK_VERSION: ${{ needs.pre-deploy-keycloak-user.outputs.next-version }}
+          DB_VERSION: ${{ needs.pre-deploy-db-users.outputs.next-version }}
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_PAT }}
+          SNAPSHOT: ${{ inputs.snapshot == true }}
